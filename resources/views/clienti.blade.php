@@ -25,7 +25,7 @@
         </div>
 
         @if ($categories->isNotEmpty())
-            <div class="filter-pills top-margin-mid">
+            <div class="filter-pills top-margin">
                 <a @class(['filter-pill', 'active' => ! $activeCategory]) href="{{ route('clienti') }}">Tutti</a>
                 @foreach ($categories as $category)
                     <a
@@ -38,7 +38,7 @@
             </div>
         @endif
 
-        <div class="grid-2 top-margin small-gap">
+        <div class="grid-2 top-margin-xl small-gap">
             @forelse ($clients as $client)
                 <a class="portfolio-card" href="{{ route('clienti.show', $client) }}" style="background-image: url('{{ $client->coverImageUrl() }}');">
                     <div class="portfolio-content display-none">
