@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\PortfolioProject;
+use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 class PortfolioController extends Controller
@@ -19,15 +21,28 @@ class PortfolioController extends Controller
         return view('home', compact('projects'));
     }
 
-    public function index(): View
+    public function index(Request $request): View
     {
+        $categories = PortfolioProject::query()
+            ->published()
+            ->whereNotNull('category')
+            ->where('category', '!=', '')
+            ->orderBy('category')
+            ->pluck('category')
+            ->unique()
+            ->values();
+
+        $selectedCategory = $request->query('categoria');
+        $activeCategory = $categories->first(fn ($category) => Str::slug($category) === $selectedCategory);
+
         $projects = PortfolioProject::query()
             ->published()
+            ->when($activeCategory, fn ($query) => $query->where('category', $activeCategory))
             ->orderBy('sort_order')
             ->orderBy('title')
             ->get();
 
-        return view('portfolio', compact('projects'));
+        return view('portfolio', compact('projects', 'categories', 'activeCategory'));
     }
 
     public function show(PortfolioProject $portfolioProject): View

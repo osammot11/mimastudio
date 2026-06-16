@@ -7,7 +7,7 @@
 
     <title>@yield('title', 'Mima Studio')</title>
 
-    <link rel="stylesheet" href="{{ asset('css/style.css') }}?v=2.3">
+    <link rel="stylesheet" href="{{ asset('css/style.css') }}?v=2.4">
 </head>
 
 <body>

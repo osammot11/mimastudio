@@ -112,6 +112,7 @@ class ClientController extends Controller
                 Rule::unique('clients', 'slug')->ignore($client),
             ],
             'description' => ['required', 'string', 'max:255'],
+            'category' => ['nullable', 'string', 'max:255'],
             'client_date' => ['nullable', 'date'],
             'sort_order' => ['required', 'integer', 'min:0'],
             'is_published' => ['nullable', 'boolean'],

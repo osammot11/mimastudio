@@ -39,6 +39,34 @@ class PortfolioTest extends TestCase
             ->assertDontSee('Hidden Project');
     }
 
+    public function test_portfolio_index_can_be_filtered_by_category(): void
+    {
+        PortfolioProject::create([
+            'title' => 'Portrait Project',
+            'slug' => 'portrait-project',
+            'description' => 'Portrait description',
+            'cover_image' => 'images/portfolio-1.jpeg',
+            'category' => 'Ritratti',
+            'sort_order' => 1,
+            'is_published' => true,
+        ]);
+
+        PortfolioProject::create([
+            'title' => 'Brand Project',
+            'slug' => 'brand-project',
+            'description' => 'Brand description',
+            'cover_image' => 'images/portfolio-2.jpeg',
+            'category' => 'Brand',
+            'sort_order' => 2,
+            'is_published' => true,
+        ]);
+
+        $this->get('/portfolio?categoria=ritratti')
+            ->assertOk()
+            ->assertSee('Portrait Project')
+            ->assertDontSee('Brand Project');
+    }
+
     public function test_published_project_detail_is_visible_and_hidden_project_is_not(): void
     {
         PortfolioProject::create([

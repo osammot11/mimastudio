@@ -24,6 +24,20 @@
             <h2>Collaborazioni, brand e realtà del territorio raccontate attraverso immagini curate e riconoscibili.</h2>
         </div>
 
+        @if ($categories->isNotEmpty())
+            <div class="filter-pills top-margin-mid">
+                <a @class(['filter-pill', 'active' => ! $activeCategory]) href="{{ route('clienti') }}">Tutti</a>
+                @foreach ($categories as $category)
+                    <a
+                        @class(['filter-pill', 'active' => $activeCategory === $category])
+                        href="{{ route('clienti', ['categoria' => \Illuminate\Support\Str::slug($category)]) }}"
+                    >
+                        {{ $category }}
+                    </a>
+                @endforeach
+            </div>
+        @endif
+
         <div class="grid-2 top-margin small-gap">
             @forelse ($clients as $client)
                 <a class="portfolio-card" href="{{ route('clienti.show', $client) }}" style="background-image: url('{{ $client->coverImageUrl() }}');">

@@ -22,6 +22,11 @@
             <label for="description">Descrizione breve</label>
             <input id="description" type="text" name="description" value="{{ old('description', $client->description) }}" required>
         </div>
+
+        <div class="admin-field">
+            <label for="category">Categoria</label>
+            <input id="category" type="text" name="category" value="{{ old('category', $client->category) }}" placeholder="Es. Brand, Eventi, Ritratti">
+        </div>
     </section>
 
     <section class="admin-card admin-form-section">

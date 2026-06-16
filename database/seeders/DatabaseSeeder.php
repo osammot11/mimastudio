@@ -66,17 +66,18 @@ class DatabaseSeeder extends Seeder
         }
 
         $clients = [
-            ['Arianna Studio', 'Ritratti e contenuti visuali per una realtà creativa del territorio lucchese.', '2026-01-12'],
-            ['Casa Velata', 'Racconto fotografico di uno spazio ricettivo, tra dettagli, luce e atmosfera.', '2026-02-18'],
-            ['Linea Forma', 'Immagini prodotto per catalogo, social e comunicazione digitale.', '2026-03-22'],
-            ['Marea Events', 'Reportage essenziale per un evento privato seguito con discrezione.', '2026-04-09'],
+            ['Arianna Studio', 'Ritratti', 'Ritratti e contenuti visuali per una realtà creativa del territorio lucchese.', '2026-01-12'],
+            ['Casa Velata', 'Location', 'Racconto fotografico di uno spazio ricettivo, tra dettagli, luce e atmosfera.', '2026-02-18'],
+            ['Linea Forma', 'Brand', 'Immagini prodotto per catalogo, social e comunicazione digitale.', '2026-03-22'],
+            ['Marea Events', 'Eventi', 'Reportage essenziale per un evento privato seguito con discrezione.', '2026-04-09'],
         ];
 
-        foreach ($clients as $index => [$name, $description, $date]) {
+        foreach ($clients as $index => [$name, $category, $description, $date]) {
             $client = Client::updateOrCreate(
                 ['slug' => Str::slug($name)],
                 [
                     'name' => $name,
+                    'category' => $category,
                     'description' => $description,
                     'client_date' => $date,
                     'photo_image' => 'images/portfolio-'.($index + 1).'.jpeg',

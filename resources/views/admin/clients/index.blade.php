@@ -34,7 +34,9 @@
                         <img class="admin-thumb" src="{{ $client->photoImageUrl() }}" alt="{{ $client->name }}">
                         <div class="admin-title">
                             <h3>{{ $client->name }}</h3>
-                            <p class="admin-meta">{{ $client->client_date ? $client->client_date->format('d/m/Y') : 'Senza data' }}</p>
+                            <p class="admin-meta">
+                                {{ $client->category ?: 'Senza categoria' }} · {{ $client->client_date ? $client->client_date->format('d/m/Y') : 'Senza data' }}
+                            </p>
                         </div>
                         <span @class(['admin-status', 'is-hidden' => ! $client->is_published])>
                             {{ $client->is_published ? 'Pubblicato' : 'Nascosto' }}

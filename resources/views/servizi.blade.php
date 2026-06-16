@@ -18,83 +18,59 @@
 @endsection
 
 @section('content')
-        <section class="bottom-line section-small-xl-padding">
-            <div class="grid-2">
-                <div>
-                    <img class="sticky"
-                        src="https://assets-global.website-files.com/65f45868d16d48662164da00/65fa099d2c6b098ca488f97d_Image%20037.webp"
-                        style="width: 100%; border-radius: 8px;">
-                </div>
-                <div class="center-vertical">
-                    <div class="stack-large top-margin text-container">
-                        <div class="pill">RITRATTI</div>
-                        <h2>Ritratti per persone, professionisti e personalità del territorio.</h2>
-                        <p>Sessioni pensate per restituire un'immagine autentica, curata e riconoscibile, adatta a comunicazione personale, editoriale o professionale.</p>
-                        <div class="stack-large">
-                            <div class="dot-line-box"></div>
-                            <p>01  |  Brief iniziale e definizione del tono visivo</p>
-                            <div class="dot-line-box"></div>
-                            <p>02  |  Shooting guidato, naturale e senza pose forzate</p>
-                            <div class="dot-line-box"></div>
-                            <p>03  |  Selezione e post-produzione delle immagini finali</p>
-                            <div class="dot-line-box"></div>
-                        </div>
-                    </div>
-                </div>
+        <section class="section-standard bottom-line">
+            <div class="text-container-center center-items center-text stack-large">
+                <p class="pill">SERVIZI</p>
+                <h2>Scegli il tipo di racconto fotografico più vicino al tuo progetto.</h2>
             </div>
+
+            @if ($categories->isNotEmpty())
+                <div class="filter-pills top-margin-mid">
+                    <a @class(['filter-pill', 'active' => ! $activeCategory]) href="{{ route('servizi') }}">Tutti</a>
+                    @foreach ($categories as $category)
+                        <a
+                            @class(['filter-pill', 'active' => $activeCategory === $category])
+                            href="{{ route('servizi', ['categoria' => \Illuminate\Support\Str::slug($category)]) }}"
+                        >
+                            {{ $category }}
+                        </a>
+                    @endforeach
+                </div>
+            @endif
         </section>
 
-        <section class="bottom-line section-small-xl-padding">
-            <div class="grid-2">
-                <div class="center-vertical">
-                    <div class="stack-large top-margin text-container">
-                        <div class="pill">EVENTI E LOCATION</div>
-                        <h2>Raccontare luoghi, format ed eventi con immagini chiare e vive.</h2>
-                        <p>Dalle atmosfere di Lucca Comics and Games agli eventi privati e culturali, il reportage segue il ritmo della giornata senza perdere i dettagli importanti.</p>
-                        <div class="stack-large">
-                            <div class="dot-line-box"></div>
-                            <p>01  |  Sopralluogo o confronto preliminare sul programma</p>
-                            <div class="dot-line-box"></div>
-                            <p>02  |  Copertura fotografica discreta e continuativa</p>
-                            <div class="dot-line-box"></div>
-                            <p>03  |  Gallery pronta per archivio, stampa e comunicazione</p>
-                            <div class="dot-line-box"></div>
+        @foreach ($services as $service)
+            <section class="bottom-line section-small-xl-padding">
+                <div class="grid-2">
+                    @if ($loop->iteration % 2 === 1)
+                        <div>
+                            <img class="sticky" src="{{ $service['image'] }}" style="width: 100%; border-radius: 8px;" alt="{{ $service['category'] }}">
                         </div>
-                    </div>
-                </div>
-                <div>
-                    <img class="sticky"
-                        src="https://assets-global.website-files.com/65f45868d16d48662164da00/65fa099d2c6b098ca488f97d_Image%20037.webp"
-                        style="width: 100%; border-radius: 8px;">
-                </div>
-            </div>
-        </section>
+                    @endif
 
-        <section class="bottom-line section-small-xl-padding">
-            <div class="grid-2">
-                <div>
-                    <img class="sticky"
-                        src="https://assets-global.website-files.com/65f45868d16d48662164da00/65fa099d2c6b098ca488f97d_Image%20037.webp"
-                        style="width: 100%; border-radius: 8px;">
-                </div>
-                <div class="center-vertical">
-                    <div class="stack-large top-margin text-container">
-                        <div class="pill">BRAND E PRODOTTI</div>
-                        <h2>Immagini per brand che vogliono comunicare identità, qualità e carattere.</h2>
-                        <p>Dagli shooting prodotto ai contenuti social, Michele lavora su set essenziali e coerenti, anche per marchi con visibilità internazionale come sunsetersbrand.com.</p>
-                        <div class="stack-large">
-                            <div class="dot-line-box"></div>
-                            <p>01  |  Definizione mood, uso finale e riferimenti visivi</p>
-                            <div class="dot-line-box"></div>
-                            <p>02  |  Shooting prodotto, lifestyle o campagna</p>
-                            <div class="dot-line-box"></div>
-                            <p>03  |  File ottimizzati per web, social e materiali promozionali</p>
-                            <div class="dot-line-box"></div>
+                    <div class="center-vertical">
+                        <div class="stack-large top-margin text-container">
+                            <div class="pill">{{ strtoupper($service['category']) }}</div>
+                            <h2>{{ $service['title'] }}</h2>
+                            <p>{{ $service['description'] }}</p>
+                            <div class="stack-large">
+                                @foreach ($service['steps'] as $step)
+                                    <div class="dot-line-box"></div>
+                                    <p>{{ str_pad($loop->iteration, 2, '0', STR_PAD_LEFT) }}  |  {{ $step }}</p>
+                                @endforeach
+                                <div class="dot-line-box"></div>
+                            </div>
                         </div>
                     </div>
+
+                    @if ($loop->iteration % 2 === 0)
+                        <div>
+                            <img class="sticky" src="{{ $service['image'] }}" style="width: 100%; border-radius: 8px;" alt="{{ $service['category'] }}">
+                        </div>
+                    @endif
                 </div>
-            </div>
-        </section>
+            </section>
+        @endforeach
 
         <section class="section-xl-padding">
             <div class="wrapper center-items">

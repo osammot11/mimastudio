@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
     'name',
     'slug',
     'description',
+    'category',
     'client_date',
     'photo_image',
     'cover_image',

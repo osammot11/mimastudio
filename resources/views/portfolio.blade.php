@@ -26,6 +26,20 @@
                 <a class="btn-2" href="/contatti">Richiedi un servizio</a>
             </div>
 
+            @if ($categories->isNotEmpty())
+                <div class="filter-pills top-margin-mid">
+                    <a @class(['filter-pill', 'active' => ! $activeCategory]) href="{{ route('portfolio') }}">Tutti</a>
+                    @foreach ($categories as $category)
+                        <a
+                            @class(['filter-pill', 'active' => $activeCategory === $category])
+                            href="{{ route('portfolio', ['categoria' => \Illuminate\Support\Str::slug($category)]) }}"
+                        >
+                            {{ $category }}
+                        </a>
+                    @endforeach
+                </div>
+            @endif
+
             <div class="grid-2 top-margin small-gap">
                 @forelse ($projects as $project)
                     <a class="portfolio-card" href="{{ route('portfolio.show', $project) }}" style="background-image: url('{{ $project->coverImageUrl() }}');">

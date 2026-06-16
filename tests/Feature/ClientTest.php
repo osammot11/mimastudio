@@ -41,6 +41,36 @@ class ClientTest extends TestCase
             ->assertDontSee('Hidden Client');
     }
 
+    public function test_clients_index_can_be_filtered_by_category(): void
+    {
+        Client::create([
+            'name' => 'Brand Client',
+            'slug' => 'brand-client',
+            'description' => 'Brand description',
+            'category' => 'Brand',
+            'photo_image' => 'images/portfolio-1.jpeg',
+            'cover_image' => 'images/portfolio-2.jpeg',
+            'sort_order' => 1,
+            'is_published' => true,
+        ]);
+
+        Client::create([
+            'name' => 'Event Client',
+            'slug' => 'event-client',
+            'description' => 'Event description',
+            'category' => 'Eventi',
+            'photo_image' => 'images/portfolio-3.jpeg',
+            'cover_image' => 'images/portfolio-4.jpeg',
+            'sort_order' => 2,
+            'is_published' => true,
+        ]);
+
+        $this->get('/clienti?categoria=brand')
+            ->assertOk()
+            ->assertSee('Brand Client')
+            ->assertDontSee('Event Client');
+    }
+
     public function test_published_client_detail_is_visible_and_hidden_client_is_not(): void
     {
         Client::create([
