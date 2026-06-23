@@ -7,7 +7,7 @@
 
     <title>@yield('title', 'Mima Studio')</title>
 
-    <link rel="stylesheet" href="{{ asset('css/style.css') }}?v=2.4">
+    @vite('resources/css/app.css')
 </head>
 
 <body>
@@ -120,7 +120,7 @@
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/gsap.min.js"></script>
-    <script src="{{ asset('js/app.js') }}?v=2.0"></script>
+    @vite('resources/js/app.js')
 </body>
 
 </html>

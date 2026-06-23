@@ -138,13 +138,18 @@ select {
     letter-spacing: 0.08em;
 }
 
-.admin-topbar-actions,
-.admin-actions {
+.admin-topbar-actions {
     display: flex;
     align-items: center;
     justify-content: flex-end;
     gap: 10px;
     flex-wrap: wrap;
+}
+
+.admin-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
 }
 
 .admin-card {

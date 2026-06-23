@@ -5,11 +5,10 @@ use App\Http\Controllers\Admin\ClientController as AdminClientController;
 use App\Http\Controllers\Admin\PortfolioProjectController as AdminPortfolioProjectController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\PortfolioController;
-use App\Http\Controllers\ServiceController;
 use Illuminate\Support\Facades\Route;
 
 Route::view('/contatti', 'contatti')->name('contatti');
-Route::get('/servizi', [ServiceController::class, 'index'])->name('servizi');
+Route::view('/servizi', 'servizi')->name('servizi');
 Route::get('/clienti', [ClientController::class, 'index'])->name('clienti');
 Route::get('/clienti/{client}', [ClientController::class, 'show'])->name('clienti.show');
 Route::get('/', [PortfolioController::class, 'home'])->name('home');

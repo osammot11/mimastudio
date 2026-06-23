@@ -7,15 +7,14 @@
 
     <title>@yield('title', 'Admin - Mima Studio')</title>
 
-    <link rel="stylesheet" href="{{ asset('css/admin.css') }}?v=1.0">
+    @vite('resources/css/admin.css')
 </head>
 
 <body class="admin-body">
     <div class="admin-shell">
         <aside class="admin-sidebar">
             <a class="admin-brand" href="{{ route('admin.dashboard') }}">
-                <span>Mima Studio</span>
-                <small>Admin</small>
+                <span>Michele Mariani Studio</span>
             </a>
 
             @auth
