@@ -28,7 +28,7 @@
                 <div class="center-vertical">
                     <div class="stack-large top-margin text-container">
                         <div class="pill">RITRATTI</div>
-                        <h2>Ritratti per persone, professionisti e personalità del territorio.</h2>
+                        <h2>Per cogliere l'essenza invisibile all'occhio nudo.</h2>
                         <p>Sessioni pensate per restituire un'immagine autentica, curata e riconoscibile, adatta a comunicazione personale, editoriale o professionale.</p>
                         <div class="stack-large">
                             <div class="dot-line-box"></div>
@@ -48,8 +48,8 @@
             <div class="grid-2">
                 <div class="center-vertical">
                     <div class="stack-large top-margin text-container">
-                        <div class="pill">EVENTI E LOCATION</div>
-                        <h2>Raccontare luoghi, format ed eventi con immagini chiare e vive.</h2>
+                        <div class="pill">CERIMONIE</div>
+                        <h2>Battesimi, comunioni, commemorazioni e cerimonie.</h2>
                         <p>Dalle atmosfere di Lucca Comics and Games agli eventi privati e culturali, il reportage segue il ritmo della giornata senza perdere i dettagli importanti.</p>
                         <div class="stack-large">
                             <div class="dot-line-box"></div>
@@ -79,8 +79,8 @@
                 </div>
                 <div class="center-vertical">
                     <div class="stack-large top-margin text-container">
-                        <div class="pill">BRAND E PRODOTTI</div>
-                        <h2>Immagini per brand che vogliono comunicare identità, qualità e carattere.</h2>
+                        <div class="pill">MATRIMONI</div>
+                        <h2>Per rendere il grande giorno assolutamente memorabile.</h2>
                         <p>Dagli shooting prodotto ai contenuti social, Michele lavora su set essenziali e coerenti, anche per marchi con visibilità internazionale come sunsetersbrand.com.</p>
                         <div class="stack-large">
                             <div class="dot-line-box"></div>
@@ -92,6 +92,84 @@
                             <div class="dot-line-box"></div>
                         </div>
                     </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="bottom-line section-small-xl-padding">
+            <div class="grid-2">
+                <div class="center-vertical">
+                    <div class="stack-large top-margin text-container">
+                        <div class="pill">BRAND</div>
+                        <h2>Catturiamo i dettagli più distintivi del tuo marchio.</h2>
+                        <p>Dalle atmosfere di Lucca Comics and Games agli eventi privati e culturali, il reportage segue il ritmo della giornata senza perdere i dettagli importanti.</p>
+                        <div class="stack-large">
+                            <div class="dot-line-box"></div>
+                            <p>01  |  Sopralluogo o confronto preliminare sul programma</p>
+                            <div class="dot-line-box"></div>
+                            <p>02  |  Copertura fotografica discreta e continuativa</p>
+                            <div class="dot-line-box"></div>
+                            <p>03  |  Gallery pronta per archivio, stampa e comunicazione</p>
+                            <div class="dot-line-box"></div>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <img class="sticky"
+                        src="https://assets-global.website-files.com/65f45868d16d48662164da00/65fa099d2c6b098ca488f97d_Image%20037.webp"
+                        style="width: 100%; border-radius: 8px;">
+                </div>
+            </div>
+        </section>
+
+        <section class="bottom-line section-small-xl-padding">
+            <div class="grid-2">
+                <div>
+                    <img class="sticky"
+                        src="https://assets-global.website-files.com/65f45868d16d48662164da00/65fa099d2c6b098ca488f97d_Image%20037.webp"
+                        style="width: 100%; border-radius: 8px;">
+                </div>
+                <div class="center-vertical">
+                    <div class="stack-large top-margin text-container">
+                        <div class="pill">GRANDI EVENTI</div>
+                        <h2>Dai grandi eventi culturali ai concerti, tutto ciò che è destinato a vivere per sempre nella memoria di chi era presente.</h2>
+                        <p>Dagli shooting prodotto ai contenuti social, Michele lavora su set essenziali e coerenti, anche per marchi con visibilità internazionale come sunsetersbrand.com.</p>
+                        <div class="stack-large">
+                            <div class="dot-line-box"></div>
+                            <p>01  |  Definizione mood, uso finale e riferimenti visivi</p>
+                            <div class="dot-line-box"></div>
+                            <p>02  |  Shooting prodotto, lifestyle o campagna</p>
+                            <div class="dot-line-box"></div>
+                            <p>03  |  File ottimizzati per web, social e materiali promozionali</p>
+                            <div class="dot-line-box"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="bottom-line section-small-xl-padding">
+            <div class="grid-2">
+                <div class="center-vertical">
+                    <div class="stack-large top-margin text-container">
+                        <div class="pill">EVENTI AZIENDALI</div>
+                        <h2>Raccontiamo insieme i momenti più memorabili della tua azienda.</h2>
+                        <p>Dalle atmosfere di Lucca Comics and Games agli eventi privati e culturali, il reportage segue il ritmo della giornata senza perdere i dettagli importanti.</p>
+                        <div class="stack-large">
+                            <div class="dot-line-box"></div>
+                            <p>01  |  Sopralluogo o confronto preliminare sul programma</p>
+                            <div class="dot-line-box"></div>
+                            <p>02  |  Copertura fotografica discreta e continuativa</p>
+                            <div class="dot-line-box"></div>
+                            <p>03  |  Gallery pronta per archivio, stampa e comunicazione</p>
+                            <div class="dot-line-box"></div>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <img class="sticky"
+                        src="https://assets-global.website-files.com/65f45868d16d48662164da00/65fa099d2c6b098ca488f97d_Image%20037.webp"
+                        style="width: 100%; border-radius: 8px;">
                 </div>
             </div>
         </section>
