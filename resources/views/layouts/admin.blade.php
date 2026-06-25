@@ -21,6 +21,7 @@
                 <nav class="admin-nav" aria-label="Admin">
                     <a @class(['active' => request()->routeIs('admin.portfolio.*')]) href="{{ route('admin.portfolio.index') }}">Portfolio</a>
                     <a @class(['active' => request()->routeIs('admin.clients.*')]) href="{{ route('admin.clients.index') }}">Clienti</a>
+                    <a @class(['active' => request()->routeIs('admin.contact-requests.*')]) href="{{ route('admin.contact-requests.index') }}">Richieste</a>
                 </nav>
 
                 <div class="admin-sidebar-footer">

@@ -2,12 +2,15 @@
 
 use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\ClientController as AdminClientController;
+use App\Http\Controllers\Admin\ContactRequestController as AdminContactRequestController;
 use App\Http\Controllers\Admin\PortfolioProjectController as AdminPortfolioProjectController;
 use App\Http\Controllers\ClientController;
+use App\Http\Controllers\ContactRequestController;
 use App\Http\Controllers\PortfolioController;
 use Illuminate\Support\Facades\Route;
 
 Route::view('/contatti', 'contatti')->name('contatti');
+Route::post('/contatti', [ContactRequestController::class, 'store'])->name('contatti.store');
 Route::view('/servizi', 'servizi')->name('servizi');
 Route::get('/clienti', [ClientController::class, 'index'])->name('clienti');
 Route::get('/clienti/{client}', [ClientController::class, 'show'])->name('clienti.show');
@@ -30,6 +33,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::resource('clients', AdminClientController::class)
             ->parameters(['clients' => 'client'])
             ->except(['show']);
+        Route::resource('contact-requests', AdminContactRequestController::class)
+            ->only(['index', 'show', 'destroy']);
         Route::resource('portfolio', AdminPortfolioProjectController::class)
             ->parameters(['portfolio' => 'portfolioProject'])
             ->except(['show']);

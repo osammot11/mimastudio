@@ -739,7 +739,8 @@ a {
 }
 
 .contact-form input,
-.contact-form textarea {
+.contact-form textarea,
+.contact-form select {
     width: 100%;
     border: 0;
     border-bottom: solid 1px var(--border-light);
@@ -752,13 +753,177 @@ a {
 }
 
 .contact-form input:focus,
-.contact-form textarea:focus {
+.contact-form textarea:focus,
+.contact-form select:focus {
     border-color: var(--text-main);
     outline: none;
 }
 
 .contact-form button {
     width: fit-content;
+}
+
+.contact-wizard {
+    align-self: start;
+    width: 100%;
+    padding: 36px;
+    border: solid 1px var(--border-light);
+    border-radius: var(--radius-small);
+    background-color: var(--bg-card);
+    overflow: hidden;
+}
+
+.contact-progress {
+    display: grid;
+    gap: 14px;
+    margin-bottom: 24px;
+}
+
+.contact-progress-line {
+    height: 2px;
+    background-color: var(--border-light);
+    overflow: hidden;
+}
+
+.contact-progress-line span {
+    display: block;
+    width: 100%;
+    height: 100%;
+    background-color: var(--text-main);
+    transform: scaleX(0);
+    transform-origin: left center;
+}
+
+.contact-steps {
+    position: relative;
+}
+
+.contact-step {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    will-change: transform, opacity;
+}
+
+.contact-step label:not(.contact-option):not(.contact-privacy) {
+    display: grid;
+    gap: 4px;
+}
+
+.contact-step label > span {
+    font-size: 0.85rem;
+}
+
+.contact-step small {
+    display: block;
+    color: var(--text-muted);
+    font-weight: 300;
+}
+
+.contact-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.contact-option input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.contact-option span {
+    display: block;
+    padding: 10px 15px;
+    border: solid 1px var(--border-light);
+    border-radius: 50px;
+    cursor: pointer;
+    transition: color 0.25s ease, background-color 0.25s ease, border-color 0.25s ease;
+}
+
+.contact-option input:focus-visible + span {
+    outline: solid 2px var(--text-main);
+    outline-offset: 2px;
+}
+
+.contact-option input:checked + span {
+    color: var(--text-white);
+    background-color: var(--text-main);
+    border-color: var(--text-main);
+}
+
+.contact-options-list {
+    display: grid;
+}
+
+.contact-options-list .contact-option span {
+    border-radius: var(--radius-small);
+}
+
+.contact-options-list strong {
+    display: block;
+    font-weight: 500;
+}
+
+.contact-options-list input:checked + span small {
+    color: var(--border-light);
+}
+
+.contact-privacy {
+    display: grid;
+    grid-template-columns: 20px 1fr;
+    gap: 12px;
+    align-items: start;
+}
+
+.contact-privacy input {
+    width: 18px;
+    height: 18px;
+    margin-top: 3px;
+}
+
+.contact-privacy a {
+    text-decoration: underline;
+}
+
+.contact-navigation {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    margin-top: 36px;
+}
+
+.contact-success,
+.contact-server-errors {
+    display: grid;
+    gap: 10px;
+    margin-bottom: 24px;
+    padding: 20px;
+    border: solid 1px var(--border-light);
+    border-radius: var(--radius-small);
+    background-color: var(--bg-card);
+}
+
+.contact-success {
+    border-color: #AFCDBA;
+}
+
+.contact-server-errors {
+    border-color: #D9B3B3;
+    color: #7D2525;
+}
+
+.contact-error {
+    min-height: 1.6em;
+    margin-top: 18px;
+    color: #A52A2A;
+}
+
+.contact-navigation [hidden] {
+    display: none;
 }
 
 .admin-table {
@@ -1094,6 +1259,31 @@ footer {
     .btn,
     .btn-2 {
         font-size: 15px;
+    }
+
+    .contact-wizard {
+        padding: 24px 18px;
+    }
+
+    .contact-progress {
+        margin-bottom: 28px;
+    }
+
+    .contact-options {
+        gap: 8px;
+    }
+
+    .contact-option span {
+        padding: 9px 12px;
+        font-size: 14px;
+    }
+
+    .contact-navigation {
+        align-items: stretch;
+    }
+
+    .contact-navigation .btn-2 {
+        flex: 1;
     }
 
     .mobile-fullwidth {

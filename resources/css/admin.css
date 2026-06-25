@@ -213,6 +213,11 @@ select {
     border-bottom: 1px solid var(--admin-border);
 }
 
+.admin-requests .admin-table-head,
+.admin-requests .admin-row {
+    grid-template-columns: 140px minmax(220px, 1fr) 150px 90px 170px;
+}
+
 .admin-row:last-child {
     border-bottom: 0;
 }
@@ -439,6 +444,7 @@ select {
     }
 
     .admin-row,
+    .admin-requests .admin-row,
     .admin-gallery-row,
     .admin-media-field,
     .admin-grid-2 {
