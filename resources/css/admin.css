@@ -187,6 +187,12 @@ select {
     padding: 12px 14px;
 }
 
+.admin-alert.error {
+    border-color: #e4c2c2;
+    background: #fff7f7;
+    color: var(--admin-danger);
+}
+
 .admin-table {
     display: grid;
 }
@@ -216,6 +222,11 @@ select {
 .admin-requests .admin-table-head,
 .admin-requests .admin-row {
     grid-template-columns: 140px minmax(220px, 1fr) 150px 90px 170px;
+}
+
+.admin-deliveries .admin-table-head,
+.admin-deliveries .admin-row {
+    grid-template-columns: 120px minmax(220px, 1fr) 140px 110px 170px;
 }
 
 .admin-row:last-child {
@@ -265,6 +276,11 @@ select {
 .admin-status.is-hidden {
     background: #f2ece8;
     color: #7c3d28;
+}
+
+.admin-status.is-failed {
+    background: #fff0f0;
+    color: var(--admin-danger);
 }
 
 .admin-btn,
@@ -337,6 +353,16 @@ select {
 
 .admin-field textarea {
     resize: vertical;
+}
+
+.admin-break-word {
+    overflow-wrap: anywhere;
+}
+
+.admin-error-text {
+    margin: 0;
+    color: var(--admin-danger);
+    overflow-wrap: anywhere;
 }
 
 .admin-field input:focus,
@@ -445,6 +471,7 @@ select {
 
     .admin-row,
     .admin-requests .admin-row,
+    .admin-deliveries .admin-row,
     .admin-gallery-row,
     .admin-media-field,
     .admin-grid-2 {

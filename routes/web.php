@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\ClientController as AdminClientController;
 use App\Http\Controllers\Admin\ContactRequestController as AdminContactRequestController;
 use App\Http\Controllers\Admin\PortfolioProjectController as AdminPortfolioProjectController;
+use App\Http\Controllers\Admin\WorkDeliveryController as AdminWorkDeliveryController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\ContactRequestController;
 use App\Http\Controllers\PortfolioController;
@@ -35,6 +36,11 @@ Route::prefix('admin')->name('admin.')->group(function () {
             ->except(['show']);
         Route::resource('contact-requests', AdminContactRequestController::class)
             ->only(['index', 'show', 'destroy']);
+        Route::post('work-deliveries/{workDelivery}/resend', [AdminWorkDeliveryController::class, 'resend'])
+            ->name('work-deliveries.resend');
+        Route::resource('work-deliveries', AdminWorkDeliveryController::class)
+            ->parameters(['work-deliveries' => 'workDelivery'])
+            ->only(['index', 'create', 'store', 'show', 'destroy']);
         Route::resource('portfolio', AdminPortfolioProjectController::class)
             ->parameters(['portfolio' => 'portfolioProject'])
             ->except(['show']);

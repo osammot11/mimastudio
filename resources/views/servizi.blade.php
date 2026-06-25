@@ -74,7 +74,7 @@
             <div class="grid-2">
                 <div>
                     <img class="sticky"
-                        src="https://assets-global.website-files.com/65f45868d16d48662164da00/65fa099d2c6b098ca488f97d_Image%20037.webp"
+                        src="{{ asset('images/copertina-matrimonio.JPG') }}"
                         style="width: 100%; border-radius: 8px;">
                 </div>
                 <div class="center-vertical">

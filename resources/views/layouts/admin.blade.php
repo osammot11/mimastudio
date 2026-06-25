@@ -22,6 +22,7 @@
                     <a @class(['active' => request()->routeIs('admin.portfolio.*')]) href="{{ route('admin.portfolio.index') }}">Portfolio</a>
                     <a @class(['active' => request()->routeIs('admin.clients.*')]) href="{{ route('admin.clients.index') }}">Clienti</a>
                     <a @class(['active' => request()->routeIs('admin.contact-requests.*')]) href="{{ route('admin.contact-requests.index') }}">Richieste</a>
+                    <a @class(['active' => request()->routeIs('admin.work-deliveries.*')]) href="{{ route('admin.work-deliveries.index') }}">Consegna lavoro</a>
                 </nav>
 
                 <div class="admin-sidebar-footer">
@@ -49,6 +50,12 @@
             @if (session('status'))
                 <div class="admin-alert">
                     {{ session('status') }}
+                </div>
+            @endif
+
+            @if (session('status_error'))
+                <div class="admin-alert error">
+                    {{ session('status_error') }}
                 </div>
             @endif
 
