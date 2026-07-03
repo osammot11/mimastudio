@@ -174,6 +174,32 @@
             </div>
         </section>
 
+        <section class="bottom-line section-small-xl-padding">
+            <div class="grid-2">
+                <div>
+                    <img class="sticky"
+                        src="https://assets-global.website-files.com/65f45868d16d48662164da00/65fa099d2c6b098ca488f97d_Image%20037.webp"
+                        style="width: 100%; border-radius: 8px;">
+                </div>
+                <div class="center-vertical">
+                    <div class="stack-large top-margin text-container">
+                        <div class="pill">IMMOBILIARE</div>
+                        <h2>Attenzione al dettaglio e capacità di catturare l'essenza dell'immobile</h2>
+                        <p>Dagli shooting prodotto ai contenuti social, Michele lavora su set essenziali e coerenti, anche per marchi con visibilità internazionale come sunsetersbrand.com.</p>
+                        <div class="stack-large">
+                            <div class="dot-line-box"></div>
+                            <p>01  |  Definizione mood, uso finale e riferimenti visivi</p>
+                            <div class="dot-line-box"></div>
+                            <p>02  |  Shooting prodotto, lifestyle o campagna</p>
+                            <div class="dot-line-box"></div>
+                            <p>03  |  File ottimizzati per web, social e materiali promozionali</p>
+                            <div class="dot-line-box"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <section class="section-xl-padding">
             <div class="wrapper center-items">
                 <div class="text-container-center center-text stack-mid">

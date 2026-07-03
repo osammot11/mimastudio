@@ -41,7 +41,7 @@
         <div class="grid-2 top-margin-xl small-gap">
             @forelse ($clients as $client)
                 <a class="portfolio-card" href="{{ route('clienti.show', $client) }}" style="background-image: url('{{ $client->coverImageUrl() }}');">
-                    <div class="portfolio-content display-none">
+                    <div class="portfolio-content display-none stack-small">
                         <h3>{{ $client->name }}</h3>
                         <h6>{{ $client->description }}</h6>
                     </div>

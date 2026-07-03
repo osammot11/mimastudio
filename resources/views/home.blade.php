@@ -85,7 +85,7 @@
             <div class="grid-2 top-margin small-gap">
                 @forelse ($projects as $project)
                     <a class="portfolio-card" href="{{ route('portfolio.show', $project) }}" style="background-image: url('{{ $project->coverImageUrl() }}');">
-                        <div class="portfolio-content display-none">
+                        <div class="portfolio-content display-none stack-small">
                             <h3>{{ $project->title }}</h3>
                             <h6>{{ $project->description }}</h6>
                         </div>
@@ -264,7 +264,7 @@
                                 <h4>"Michele ha saputo metterci a nostro agio e restituire immagini naturali, curate e mai forzate."</h4>
                                     <div>
                                         <h6>Cliente ritratto</h6>
-                                        <p>Ritratti professionali</p>
+                                        <p class="color-disabled">Ritratti professionali</p>
                                     </div>
                             </div>
 
@@ -272,7 +272,7 @@
                                 <h4>"Ha capito subito il carattere del luogo e lo ha trasformato in una serie di immagini perfette per la nostra comunicazione."</h4>
                                     <div>
                                         <h6>Luca Moretti</h6>
-                                        <p>Spazi e location</p>
+                                        <p class="color-disabled">Spazi e location</p>
                                     </div>
                             </div>
 
@@ -280,7 +280,7 @@
                                 <h4>"Le foto prodotto sono finalmente pulite, credibili e riconoscibili. Il processo è stato semplice dall'inizio alla consegna."</h4>
                                     <div>
                                         <h6>Giulia Ferri</h6>
-                                        <p>Brand e prodotto</p>
+                                        <p class="color-disabled">Brand e prodotto</p>
                                     </div>
                             </div>
 
@@ -288,7 +288,7 @@
                                 <h4>"Durante la cerimonia è stato presente senza essere invadente. La gallery finale racconta davvero l'atmosfera di quel giorno."</h4>
                                     <div>
                                         <h6>Marco Rinaldi</h6>
-                                        <p>Cerimonia privata</p>
+                                        <p class="color-disabled">Cerimonia privata</p>
                                     </div>
                             </div>
                         </div>

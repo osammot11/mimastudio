@@ -1,6 +1,6 @@
 @font-face {
     font-family: "OversusedGrotesk";
-    src: url("../fonts/OverusedGrotesk-200.ttf") format("truetype");
+    src: url("/fonts/OverusedGrotesk-200.ttf") format("truetype");
     font-weight: 200;
     font-style: normal;
     font-display: swap;
@@ -8,7 +8,7 @@
 
 @font-face {
     font-family: "OversusedGrotesk";
-    src: url("../fonts/OverusedGrotesk-300.ttf") format("truetype");
+    src: url("/fonts/OverusedGrotesk-300.ttf") format("truetype");
     font-weight: 300;
     font-style: normal;
     font-display: swap;
@@ -16,7 +16,7 @@
 
 @font-face {
     font-family: "OversusedGrotesk";
-    src: url("../fonts/OverusedGrotesk-400.ttf") format("truetype");
+    src: url("/fonts/OverusedGrotesk-400.ttf") format("truetype");
     font-weight: 400;
     font-style: normal;
     font-display: swap;
@@ -24,7 +24,7 @@
 
 @font-face {
     font-family: "OversusedGrotesk";
-    src: url("../fonts/OverusedGrotesk-500.ttf") format("truetype");
+    src: url("/fonts/OverusedGrotesk-500.ttf") format("truetype");
     font-weight: 500;
     font-style: normal;
     font-display: swap;
@@ -32,7 +32,7 @@
 
 @font-face {
     font-family: "OversusedGrotesk";
-    src: url("../fonts/OverusedGrotesk-600.ttf") format("truetype");
+    src: url("/fonts/OverusedGrotesk-600.ttf") format("truetype");
     font-weight: 600;
     font-style: normal;
     font-display: swap;
@@ -40,7 +40,7 @@
 
 @font-face {
     font-family: "OversusedGrotesk";
-    src: url("../fonts/OverusedGrotesk-700.ttf") format("truetype");
+    src: url("/fonts/OverusedGrotesk-700.ttf") format("truetype");
     font-weight: 700;
     font-style: normal;
     font-display: swap;
@@ -48,7 +48,7 @@
 
 @font-face {
     font-family: "OversusedGrotesk";
-    src: url("../fonts/OverusedGrotesk-800.ttf") format("truetype");
+    src: url("/fonts/OverusedGrotesk-800.ttf") format("truetype");
     font-weight: 800;
     font-style: normal;
     font-display: swap;
@@ -56,31 +56,31 @@
 
 @font-face {
     font-family: "OversusedGrotesk";
-    src: url("../fonts/OverusedGrotesk-900.ttf") format("truetype");
+    src: url("/fonts/OverusedGrotesk-900.ttf") format("truetype");
     font-weight: 900;
     font-style: normal;
     font-display: swap;
 }
 
 :root {
-    --primary: #FFE719;
-    --primary-hover: #E6CF15;
-    --primary-soft: #FFF6A3;
+    --primary: #ffe719;
+    --primary-hover: #e6cf15;
+    --primary-soft: #fff6a3;
 
-    --bg-main: #FAFAF5;
-    --bg-secondary: #F4F4ED;
-    --bg-card: #FFFFFF;
-    --bg-alt: #EFEFE8;
+    --bg-main: #fafaf5;
+    --bg-secondary: #f4f4ed;
+    --bg-card: #ffffff;
+    --bg-alt: #efefe8;
 
     --text-main: #111111;
-    --text-secondary: #2B2B2B;
-    --text-muted: #5A5A5A;
-    --text-disabled: #8C8C8C;
-    --text-white: #FFFFFF;
+    --text-secondary: #2b2b2b;
+    --text-muted: #5a5a5a;
+    --text-disabled: #8c8c8c;
+    --text-white: #ffffff;
 
-    --border-light: #E5E5DC;
+    --border-light: #e5e5dc;
     --border-dark: #a2a2a2;
-    --font-base: 'OversusedGrotesk', sans-serif;
+    --font-base: "OversusedGrotesk", sans-serif;
     --radius-small: 6px;
     --radius-big: 12px;
 }
@@ -203,8 +203,6 @@ li {
     padding: 16px;
 }
 
-
-
 .btn-2 {
     display: inline-block;
     text-align: center;
@@ -222,8 +220,6 @@ li {
     cursor: pointer;
 }
 
-
-
 .hyperlink,
 a {
     text-decoration: none;
@@ -236,26 +232,25 @@ a {
 }
 
 /* STACK SYSTEM */
-.stack-small>*+* {
+.stack-small > * + * {
     margin-top: 0.5rem;
 }
 
-.stack-mid>*+* {
+.stack-mid > * + * {
     margin-top: 1rem;
 }
 
-.stack-large>*+* {
+.stack-large > * + * {
     margin-top: 1.5rem;
 }
 
-.stack-xl>*+* {
+.stack-xl > * + * {
     margin-top: 2.5rem;
 }
 
-.stack-xxl>*+* {
+.stack-xxl > * + * {
     margin-top: 4rem;
 }
-
 
 /* margini */
 .top-margin {
@@ -282,7 +277,6 @@ a {
     margin-top: 6rem;
 }
 
-
 /* Color */
 .main-text-color {
     color: var(--text-main);
@@ -299,7 +293,6 @@ a {
 .primary-hover-color {
     color: var(--primary-hover);
 }
-
 
 /* Layout */
 
@@ -392,27 +385,27 @@ a {
 }
 
 .card-1 {
-    background-image: url('../images/portfolio-1.jpeg');
+    background-image: url("/images/portfolio-1.jpeg");
 }
 
 .card-2 {
-    background-image: url('../images/portfolio-2.jpeg');
+    background-image: url("/images/portfolio-2.jpeg");
 }
 
 .card-3 {
-    background-image: url('../images/portfolio-3.jpeg');
+    background-image: url("/images/portfolio-3.jpeg");
 }
 
 .card-4 {
-    background-image: url('../images/portfolio-4.jpeg');
+    background-image: url("/images/portfolio-4.jpeg");
 }
 
 .card-5 {
-    background-image: url('../images/portfolio-5.jpeg');
+    background-image: url("/images/portfolio-5.jpeg");
 }
 
 .card-6 {
-    background-image: url('../images/portfolio-6.jpeg');
+    background-image: url("/images/portfolio-6.jpeg");
 }
 
 .display-none {
@@ -567,7 +560,6 @@ a {
     transform: translate(-50%, -50%) rotate(-45deg);
 }
 
-
 .grid-2 {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -603,7 +595,6 @@ a {
         0 10px 20px rgba(0, 0, 0, 0.05);
 }
 
-
 /* Hero section */
 
 .hero-section {
@@ -620,11 +611,12 @@ a {
     flex-direction: column;
     justify-content: space-between;
     border-radius: 8px;
-    background: linear-gradient(rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.35)), url(https://cdn.prod.website-files.com/65f45868d16d48662164da00/65f4862f4acc8a860c8edef3_image%20212.webp);
+    background:
+        linear-gradient(rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.35)),
+        url(https://cdn.prod.website-files.com/65f45868d16d48662164da00/65f4862f4acc8a860c8edef3_image%20212.webp);
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
-
 }
 
 .marquee {
@@ -648,7 +640,7 @@ a {
 }
 
 .hero-height {
-    min-height: 80vh
+    min-height: 80vh;
 }
 
 .text-container-center {
@@ -685,8 +677,6 @@ a {
 .footer-columns-wrapper {
     padding-bottom: 120px;
 }
-
-
 
 .bottom-line {
     border-bottom: solid 1px var(--border-light);
@@ -841,7 +831,10 @@ a {
     border: solid 1px var(--border-light);
     border-radius: 50px;
     cursor: pointer;
-    transition: color 0.25s ease, background-color 0.25s ease, border-color 0.25s ease;
+    transition:
+        color 0.25s ease,
+        background-color 0.25s ease,
+        border-color 0.25s ease;
 }
 
 .contact-option input:focus-visible + span {
@@ -908,18 +901,18 @@ a {
 }
 
 .contact-success {
-    border-color: #AFCDBA;
+    border-color: #afcdba;
 }
 
 .contact-server-errors {
-    border-color: #D9B3B3;
-    color: #7D2525;
+    border-color: #d9b3b3;
+    color: #7d2525;
 }
 
 .contact-error {
     min-height: 1.6em;
     margin-top: 18px;
-    color: #A52A2A;
+    color: #a52a2a;
 }
 
 .contact-navigation [hidden] {
@@ -980,7 +973,6 @@ a {
     align-items: center;
     padding: 16px 0;
 }
-
 
 /* footer */
 .footer a {
@@ -1081,7 +1073,7 @@ a {
 }
 
 .geometric-bg {
-    background-image: url('../images/sfondo-geometrico-home.jpeg');
+    background-image: url("../../public/images/sfondo-geometrico-home.jpeg");
     background-size: cover;
     background-repeat: no-repeat;
     background-position: center;
@@ -1169,12 +1161,15 @@ footer {
     flex-direction: column;
 }
 
+.color-disabled {
+    color: var(--text-disabled);
+}
+
 @media (min-width: 768px) {
     .desktop-none {
         display: none;
     }
 }
-
 
 @media (max-width: 768px) {
     .mobile-none {
