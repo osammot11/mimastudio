@@ -39,6 +39,7 @@
             <div class="navbar-element navbar-right mobile-none">
                 <a href="/servizi">Servizi</a>
                 <a href="/contatti">Contatti</a>
+                <a href="{{ route('client-area.login') }}">Area clienti</a>
             </div>
 
             <div id="mobile-navbar-content" class="navbar-open navbar-closed">
@@ -56,6 +57,9 @@
                 </a>
                 <a href="/contatti">
                     <h3>Contatti</h3>
+                </a>
+                <a href="{{ route('client-area.login') }}">
+                    <h3>Area clienti</h3>
                 </a>
             </div>
         </section>
@@ -78,6 +82,7 @@
                             <a href="/clienti">Clienti</a>
                             <a href="/servizi">Servizi</a>
                             <a href="/about">Chi sono</a>
+                            <a href="{{ route('client-area.login') }}">Area clienti</a>
                         </div>
                         <div class="footer-column stack-mid mobile-center">
                             <h6>Policy</h6>

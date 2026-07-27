@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\ContactRequestController as AdminContactRequestCo
 use App\Http\Controllers\Admin\PortfolioProjectController as AdminPortfolioProjectController;
 use App\Http\Controllers\Admin\WorkDeliveryController as AdminWorkDeliveryController;
 use App\Http\Controllers\ClientController;
+use App\Http\Controllers\ClientPortalController;
 use App\Http\Controllers\ContactRequestController;
 use App\Http\Controllers\PortfolioController;
 use Illuminate\Support\Facades\Route;
@@ -21,6 +22,23 @@ Route::get('/portfolio/{portfolioProject}', [PortfolioController::class, 'show']
 Route::view('/privacy-policy', 'privacy-policy')->name('privacy-policy');
 Route::view('/cookie-policy', 'cookie-policy')->name('cookie-policy');
 Route::redirect('/login', '/admin/login')->name('login');
+
+Route::prefix('area-clienti')->name('client-area.')->group(function () {
+    Route::get('/', [ClientPortalController::class, 'login'])->name('login');
+    Route::post('/link-accesso', [ClientPortalController::class, 'sendAccessLink'])
+        ->middleware('throttle:5,1')
+        ->name('send-link');
+    Route::get('/accesso', [ClientPortalController::class, 'authenticate'])
+        ->middleware('signed')
+        ->name('authenticate');
+
+    Route::middleware('client.portal')->group(function () {
+        Route::get('/lavori', [ClientPortalController::class, 'index'])->name('index');
+        Route::get('/gallerie/{client}', [ClientPortalController::class, 'showClient'])->name('clients.show');
+        Route::get('/lavori/{workDelivery}', [ClientPortalController::class, 'show'])->name('show');
+        Route::post('/logout', [ClientPortalController::class, 'logout'])->name('logout');
+    });
+});
 
 Route::prefix('admin')->name('admin.')->group(function () {
     Route::middleware('guest')->group(function () {

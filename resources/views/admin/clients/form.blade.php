@@ -13,6 +13,12 @@
         </div>
 
         <div class="admin-field">
+            <label for="email">Email cliente</label>
+            <input id="email" type="email" name="email" value="{{ old('email', $client->email) }}" autocomplete="email" required>
+            <p class="admin-help">Determina in quale area privata sarà visibile il lavoro.</p>
+        </div>
+
+        <div class="admin-field">
             <label for="slug">Slug</label>
             <input id="slug" type="text" name="slug" value="{{ old('slug', $client->slug) }}" placeholder="Lascia vuoto per generarlo automaticamente">
             <p class="admin-help">Serve per l'URL pubblico della scheda.</p>
@@ -44,9 +50,31 @@
             </div>
         </div>
 
-        <label class="admin-check">
+        <label class="admin-toggle">
             <input type="checkbox" name="is_published" value="1" @checked(old('is_published', $client->is_published ?? true))>
-            <span>Pubblicato</span>
+            <span class="admin-toggle-control" aria-hidden="true"></span>
+            <span class="admin-toggle-copy">
+                <strong>Visibile sul sito pubblico</strong>
+                <small>Mostra il lavoro nello storefront pubblico, nella sezione Clienti.</small>
+            </span>
+        </label>
+
+        <label class="admin-toggle">
+            <input type="checkbox" name="send_notification" value="1" @checked(old('send_notification', false))>
+            <span class="admin-toggle-control" aria-hidden="true"></span>
+            <span class="admin-toggle-copy">
+                <strong>Invia email di notifica</strong>
+                <small>Invia al cliente una notifica del nuovo lavoro dopo il salvataggio. Si disattiva automaticamente.</small>
+            </span>
+        </label>
+
+        <label class="admin-toggle">
+            <input type="checkbox" name="is_portal_visible" value="1" @checked(old('is_portal_visible', $client->is_portal_visible ?? true))>
+            <span class="admin-toggle-control" aria-hidden="true"></span>
+            <span class="admin-toggle-copy">
+                <strong>Visibile nell'area riservata</strong>
+                <small>Mostra il lavoro nel portale associato all'email del cliente.</small>
+            </span>
         </label>
     </section>
 

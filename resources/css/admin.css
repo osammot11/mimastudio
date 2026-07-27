@@ -381,6 +381,68 @@ select {
     width: auto;
 }
 
+.admin-toggle {
+    display: grid;
+    grid-template-columns: 52px minmax(0, 1fr);
+    gap: 12px;
+    align-items: center;
+    width: fit-content;
+    cursor: pointer;
+}
+
+.admin-toggle input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+}
+
+.admin-toggle-control {
+    position: relative;
+    width: 52px;
+    height: 30px;
+    border-radius: 999px;
+    background: #c7c7cc;
+    transition: background-color 0.2s ease;
+}
+
+.admin-toggle-control::after {
+    content: "";
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: #ffffff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.28);
+    transition: transform 0.2s ease;
+}
+
+.admin-toggle input:checked + .admin-toggle-control {
+    background: #34c759;
+}
+
+.admin-toggle input:checked + .admin-toggle-control::after {
+    transform: translateX(22px);
+}
+
+.admin-toggle input:focus-visible + .admin-toggle-control {
+    outline: 3px solid rgba(52, 199, 89, 0.28);
+    outline-offset: 2px;
+}
+
+.admin-toggle-copy {
+    display: grid;
+    gap: 2px;
+}
+
+.admin-toggle-copy small {
+    max-width: 560px;
+    color: var(--admin-muted);
+    font-weight: 400;
+}
+
 .admin-media-field {
     display: grid;
     grid-template-columns: 120px 1fr;

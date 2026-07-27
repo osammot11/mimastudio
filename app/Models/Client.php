@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 #[Fillable([
     'name',
+    'email',
     'slug',
     'description',
     'category',
@@ -17,6 +18,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
     'cover_image',
     'sort_order',
     'is_published',
+    'is_portal_visible',
 ])]
 class Client extends Model
 {
@@ -25,6 +27,7 @@ class Client extends Model
         return [
             'client_date' => 'date',
             'is_published' => 'boolean',
+            'is_portal_visible' => 'boolean',
             'sort_order' => 'integer',
         ];
     }
@@ -42,6 +45,11 @@ class Client extends Model
     public function scopePublished(Builder $query): void
     {
         $query->where('is_published', true);
+    }
+
+    public function scopePortalVisible(Builder $query): void
+    {
+        $query->where('is_portal_visible', true);
     }
 
     public function photoImageUrl(): string

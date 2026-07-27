@@ -5,7 +5,9 @@
 @section('eyebrow', 'Clienti')
 
 @section('actions')
-    <a class="admin-btn" href="{{ route('clienti.show', $client) }}" target="_blank">Vedi scheda</a>
+    @if ($client->is_published)
+        <a class="admin-btn" href="{{ route('clienti.show', $client) }}" target="_blank">Vedi scheda pubblica</a>
+    @endif
     <a class="admin-btn" href="{{ route('admin.clients.index') }}">Torna alla lista</a>
 @endsection
 

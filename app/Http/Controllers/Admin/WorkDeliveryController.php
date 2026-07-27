@@ -7,7 +7,9 @@ use App\Mail\WorkDeliveryReady;
 use App\Models\WorkDelivery;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 use Throwable;
@@ -60,7 +62,7 @@ class WorkDeliveryController extends Controller
 
     private function validatedData(Request $request): array
     {
-        return $request->validate([
+        $validated = $request->validate([
             'client_name' => ['required', 'string', 'max:255'],
             'work_description' => ['required', 'string', 'max:5000'],
             'work_date' => ['required', 'date'],
@@ -68,12 +70,27 @@ class WorkDeliveryController extends Controller
             'email' => ['required', 'email', 'max:255'],
             'gallery_url' => ['required', 'url:http,https', 'max:2048'],
         ]);
+
+        $validated['email'] = strtolower(trim($validated['email']));
+
+        return $validated;
     }
 
     private function sendDelivery(WorkDelivery $workDelivery, string $successMessage): RedirectResponse
     {
         try {
-            Mail::to($workDelivery->email)->send(new WorkDeliveryReady($workDelivery));
+            $portalUrl = URL::temporarySignedRoute(
+                'client-area.authenticate',
+                now()->addDays(7),
+                [
+                    'token' => Crypt::encryptString(strtolower(trim($workDelivery->email))),
+                    'work_delivery' => $workDelivery->getKey(),
+                ],
+            );
+
+            Mail::to($workDelivery->email)->send(
+                new WorkDeliveryReady($workDelivery, $portalUrl),
+            );
 
             $workDelivery->update([
                 'sent_at' => now(),

@@ -43,7 +43,8 @@ class WorkDeliveryTest extends TestCase
 
         Mail::assertSent(WorkDeliveryReady::class, function (WorkDeliveryReady $mail): bool {
             return $mail->hasTo('mario@example.com')
-                && $mail->workDelivery->gallery_url === 'https://example.com/gallery/mario';
+                && $mail->workDelivery->gallery_url === 'https://example.com/gallery/mario'
+                && str_contains($mail->portalUrl, '/area-clienti/accesso');
         });
 
         $this->actingAs($user)
@@ -57,10 +58,11 @@ class WorkDeliveryTest extends TestCase
             ->assertOk()
             ->assertSee('Apri galleria esterna');
 
-        (new WorkDeliveryReady($workDelivery))
+        (new WorkDeliveryReady($workDelivery, 'https://example.com/area-clienti/accesso'))
             ->assertSeeInHtml('il tuo lavoro è pronto.')
             ->assertSeeInHtml('MM-2026-001')
-            ->assertSeeInHtml('https://example.com/gallery/mario');
+            ->assertSeeInHtml('https://example.com/area-clienti/accesso')
+            ->assertDontSeeInHtml('https://example.com/gallery/mario');
     }
 
     public function test_admin_can_resend_a_work_delivery_email(): void

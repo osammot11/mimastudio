@@ -2,33 +2,29 @@
 
 namespace App\Mail;
 
-use App\Models\WorkDelivery;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class WorkDeliveryReady extends Mailable
+class ClientPortalAccess extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public function __construct(
-        public WorkDelivery $workDelivery,
-        public string $portalUrl,
-    ) {}
+    public function __construct(public string $accessUrl) {}
 
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Il tuo lavoro fotografico è pronto',
+            subject: 'Accedi alla tua area privata',
         );
     }
 
     public function content(): Content
     {
         return new Content(
-            view: 'emails.work-delivery-ready',
+            view: 'emails.client-portal-access',
         );
     }
 

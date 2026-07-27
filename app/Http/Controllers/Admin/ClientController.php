@@ -3,14 +3,18 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Mail\ClientWorkReady;
 use App\Models\Client;
-use App\Models\ClientImage;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
+use Throwable;
 
 class ClientController extends Controller
 {
@@ -29,6 +33,7 @@ class ClientController extends Controller
         return view('admin.clients.create', [
             'client' => new Client([
                 'is_published' => true,
+                'is_portal_visible' => true,
                 'sort_order' => 0,
             ]),
         ]);
@@ -38,16 +43,17 @@ class ClientController extends Controller
     {
         $data = $this->validatedClientData($request);
         $data['slug'] = $this->uniqueSlug($data['slug'] ?? $data['name']);
+        $data['email'] = strtolower(trim($data['email']));
         $data['is_published'] = $request->boolean('is_published');
+        $data['is_portal_visible'] = $request->boolean('is_portal_visible');
+        unset($data['send_notification']);
         $data['photo_image'] = $request->file('photo_image')->store('clients', 'public');
         $data['cover_image'] = $request->file('cover_image')->store('clients', 'public');
 
         $client = Client::create($data);
         $this->storeGalleryImages($request, $client);
 
-        return redirect()
-            ->route('admin.clients.edit', $client)
-            ->with('status', 'Cliente creato.');
+        return $this->savedResponse($request, $client, 'Cliente creato.');
     }
 
     public function edit(Client $client): View
@@ -61,7 +67,10 @@ class ClientController extends Controller
     {
         $data = $this->validatedClientData($request, $client);
         $data['slug'] = $this->uniqueSlug($data['slug'] ?? $data['name'], $client);
+        $data['email'] = strtolower(trim($data['email']));
         $data['is_published'] = $request->boolean('is_published');
+        $data['is_portal_visible'] = $request->boolean('is_portal_visible');
+        unset($data['send_notification']);
 
         if ($request->hasFile('photo_image')) {
             $this->deleteStoredFile($client->photo_image);
@@ -78,9 +87,7 @@ class ClientController extends Controller
         $this->deleteGalleryImages($request, $client);
         $this->storeGalleryImages($request, $client);
 
-        return redirect()
-            ->route('admin.clients.edit', $client)
-            ->with('status', 'Cliente aggiornato.');
+        return $this->savedResponse($request, $client, 'Cliente aggiornato.');
     }
 
     public function destroy(Client $client): RedirectResponse
@@ -105,6 +112,7 @@ class ClientController extends Controller
     {
         return $request->validate([
             'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'email', 'max:255'],
             'slug' => [
                 'nullable',
                 'string',
@@ -116,6 +124,8 @@ class ClientController extends Controller
             'client_date' => ['nullable', 'date'],
             'sort_order' => ['required', 'integer', 'min:0'],
             'is_published' => ['nullable', 'boolean'],
+            'send_notification' => ['nullable', 'boolean'],
+            'is_portal_visible' => ['nullable', 'boolean'],
             'photo_image' => [$client ? 'nullable' : 'required', 'image', 'max:4096'],
             'cover_image' => [$client ? 'nullable' : 'required', 'image', 'max:4096'],
             'gallery_images' => ['nullable', 'array'],
@@ -189,5 +199,55 @@ class ClientController extends Controller
         }
 
         Storage::disk('public')->delete($path);
+    }
+
+    private function savedResponse(
+        Request $request,
+        Client $client,
+        string $successMessage,
+    ): RedirectResponse {
+        $redirect = redirect()->route('admin.clients.edit', $client);
+
+        if (! $request->boolean('send_notification')) {
+            return $redirect->with('status', $successMessage);
+        }
+
+        try {
+            Mail::to($client->email)->send(
+                new ClientWorkReady($client, $this->clientAccessUrl($client)),
+            );
+
+            return $redirect->with(
+                'status',
+                $successMessage.' Email di notifica inviata.',
+            );
+        } catch (Throwable $exception) {
+            report($exception);
+
+            return $redirect
+                ->with('status', $successMessage)
+                ->with(
+                    'status_error',
+                    'Il cliente è stato salvato, ma l’email di notifica non è stata inviata.',
+                );
+        }
+    }
+
+    private function clientAccessUrl(Client $client): ?string
+    {
+        if ($client->is_portal_visible) {
+            return URL::temporarySignedRoute(
+                'client-area.authenticate',
+                now()->addDays(7),
+                [
+                    'token' => Crypt::encryptString($client->email),
+                    'client' => $client->getKey(),
+                ],
+            );
+        }
+
+        return $client->is_published
+            ? route('clienti.show', $client)
+            : null;
     }
 }
