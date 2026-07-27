@@ -16,7 +16,7 @@
                             <p style="margin:0 0 28px;font-size:14px;">MICHELE MARIANI FOTOGRAFO</p>
 
                             <h1 style="margin:0 0 20px;font-size:32px;line-height:1.2;font-weight:500;">
-                                Ciao {{ $client->name }},<br>il tuo nuovo lavoro è disponibile.
+                                Ciao {{ $client->customer->name }},<br>il tuo nuovo lavoro è disponibile.
                             </h1>
 
                             <p style="margin:0 0 28px;font-size:16px;line-height:1.6;">

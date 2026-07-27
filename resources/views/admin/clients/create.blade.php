@@ -1,8 +1,8 @@
 @extends('layouts.admin')
 
-@section('title', 'Nuovo cliente - Mima Studio')
-@section('page-title', 'Nuovo cliente')
-@section('eyebrow', 'Clienti')
+@section('title', 'Nuovo lavoro - Mima Studio')
+@section('page-title', 'Nuovo lavoro')
+@section('eyebrow', 'Lavori clienti')
 
 @section('actions')
     <a class="admin-btn" href="{{ route('admin.clients.index') }}">Torna alla lista</a>

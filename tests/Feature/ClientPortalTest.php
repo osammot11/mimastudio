@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Mail\ClientPortalAccess;
 use App\Models\Client;
+use App\Models\Customer;
 use App\Models\WorkDelivery;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Crypt;
@@ -78,19 +79,19 @@ class ClientPortalTest extends TestCase
 
         Mail::assertSent(ClientPortalAccess::class);
 
-        $this->withSession(['client_portal_email' => 'cliente@example.com'])
+        $this->withSession($this->portalSession($client))
             ->get(route('client-area.index'))
             ->assertOk()
             ->assertSee($client->name)
             ->assertDontSee($otherClient->name);
 
-        $this->withSession(['client_portal_email' => 'cliente@example.com'])
+        $this->withSession($this->portalSession($client))
             ->get(route('client-area.clients.show', $client))
             ->assertOk()
             ->assertSee('GALLERIA PRIVATA')
             ->assertSee($client->description);
 
-        $this->withSession(['client_portal_email' => 'cliente@example.com'])
+        $this->withSession($this->portalSession($client))
             ->get(route('client-area.clients.show', $otherClient))
             ->assertNotFound();
     }
@@ -110,12 +111,12 @@ class ClientPortalTest extends TestCase
 
         Mail::assertNothingSent();
 
-        $this->withSession(['client_portal_email' => 'cliente@example.com'])
+        $this->withSession($this->portalSession($client))
             ->get(route('client-area.index'))
             ->assertOk()
             ->assertDontSee($client->name);
 
-        $this->withSession(['client_portal_email' => 'cliente@example.com'])
+        $this->withSession($this->portalSession($client))
             ->get(route('client-area.clients.show', $client))
             ->assertNotFound();
     }
@@ -134,7 +135,8 @@ class ClientPortalTest extends TestCase
 
         $this->get($url)
             ->assertRedirect(route('client-area.clients.show', $client))
-            ->assertSessionHas('client_portal_email', 'cliente@example.com');
+            ->assertSessionHas('client_portal_email', 'cliente@example.com')
+            ->assertSessionHas('client_portal_customer_id', $client->customer_id);
     }
 
     public function test_client_area_requires_a_valid_session(): void
@@ -203,10 +205,14 @@ class ClientPortalTest extends TestCase
         bool $isPortalVisible = true,
     ): Client {
         $slug = 'client-'.uniqid();
-
-        return Client::create([
+        $customer = Customer::create([
             'name' => 'Cliente '.$slug,
             'email' => $email,
+        ]);
+
+        return Client::create([
+            'customer_id' => $customer->id,
+            'name' => 'Cliente '.$slug,
             'slug' => $slug,
             'description' => 'Galleria fotografica privata.',
             'photo_image' => 'images/portfolio-1.jpeg',
@@ -215,5 +221,13 @@ class ClientPortalTest extends TestCase
             'is_published' => $isPublished,
             'is_portal_visible' => $isPortalVisible,
         ]);
+    }
+
+    private function portalSession(Client $client): array
+    {
+        return [
+            'client_portal_email' => $client->customer->email,
+            'client_portal_customer_id' => $client->customer_id,
+        ];
     }
 }

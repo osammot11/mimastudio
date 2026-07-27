@@ -16,7 +16,7 @@
                 <h2>Progetti</h2>
                 <p class="admin-meta">{{ $projects->count() }} elementi totali</p>
             </div>
-            <a class="admin-link" href="{{ route('admin.clients.index') }}">Gestisci clienti</a>
+            <a class="admin-link" href="{{ route('admin.clients.index') }}">Gestisci lavori clienti</a>
         </div>
 
         @if ($projects->isNotEmpty())

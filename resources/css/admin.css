@@ -229,6 +229,16 @@ select {
     grid-template-columns: 120px minmax(220px, 1fr) 140px 110px 170px;
 }
 
+.admin-customers .admin-table-head,
+.admin-customers .admin-row {
+    grid-template-columns: minmax(180px, 1fr) minmax(220px, 1fr) 80px 240px;
+}
+
+.admin-customer-work {
+    grid-template-columns: minmax(0, 1fr) auto;
+    padding: 12px 0;
+}
+
 .admin-row:last-child {
     border-bottom: 0;
 }
@@ -320,6 +330,10 @@ select {
     gap: 18px;
 }
 
+.admin-form [hidden] {
+    display: none !important;
+}
+
 .admin-form-section {
     display: grid;
     gap: 16px;
@@ -342,7 +356,8 @@ select {
 }
 
 .admin-field input,
-.admin-field textarea {
+.admin-field textarea,
+.admin-field select {
     width: 100%;
     border: 1px solid var(--admin-border);
     border-radius: 6px;
@@ -366,7 +381,8 @@ select {
 }
 
 .admin-field input:focus,
-.admin-field textarea:focus {
+.admin-field textarea:focus,
+.admin-field select:focus {
     border-color: var(--admin-accent);
     outline: 2px solid rgba(44, 95, 85, 0.16);
 }
@@ -534,6 +550,7 @@ select {
     .admin-row,
     .admin-requests .admin-row,
     .admin-deliveries .admin-row,
+    .admin-customers .admin-row,
     .admin-gallery-row,
     .admin-media-field,
     .admin-grid-2 {

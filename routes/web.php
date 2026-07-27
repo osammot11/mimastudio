@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\ClientController as AdminClientController;
 use App\Http\Controllers\Admin\ContactRequestController as AdminContactRequestController;
+use App\Http\Controllers\Admin\CustomerController as AdminCustomerController;
 use App\Http\Controllers\Admin\PortfolioProjectController as AdminPortfolioProjectController;
 use App\Http\Controllers\Admin\WorkDeliveryController as AdminWorkDeliveryController;
 use App\Http\Controllers\ClientController;
@@ -52,6 +53,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::resource('clients', AdminClientController::class)
             ->parameters(['clients' => 'client'])
             ->except(['show']);
+        Route::resource('customers', AdminCustomerController::class)
+            ->except(['show', 'destroy']);
         Route::resource('contact-requests', AdminContactRequestController::class)
             ->only(['index', 'show', 'destroy']);
         Route::post('work-deliveries/{workDelivery}/resend', [AdminWorkDeliveryController::class, 'resend'])

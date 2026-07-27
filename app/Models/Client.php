@@ -5,11 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 #[Fillable([
     'name',
-    'email',
+    'customer_id',
     'slug',
     'description',
     'category',
@@ -40,6 +41,11 @@ class Client extends Model
     public function images(): HasMany
     {
         return $this->hasMany(ClientImage::class)->orderBy('sort_order');
+    }
+
+    public function customer(): BelongsTo
+    {
+        return $this->belongsTo(Customer::class);
     }
 
     public function scopePublished(Builder $query): void

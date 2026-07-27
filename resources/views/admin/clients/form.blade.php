@@ -4,18 +4,57 @@
         @method($method)
     @endif
 
+    @php
+        $customerMode = old('customer_mode', $defaultCustomerMode);
+        $currentCustomerId = old('customer_id', $selectedCustomerId);
+    @endphp
+
     <section class="admin-card admin-form-section">
-        <h2>Contenuti</h2>
+        <h2>Cliente</h2>
 
         <div class="admin-field">
-            <label for="name">Nome cliente</label>
-            <input id="name" type="text" name="name" value="{{ old('name', $client->name) }}" required>
+            <label for="customer_mode">Come vuoi associare il cliente?</label>
+            <select id="customer_mode" name="customer_mode" data-customer-mode required>
+                <option value="existing" @selected($customerMode === 'existing') @disabled($customers->isEmpty())>
+                    Cliente esistente
+                </option>
+                <option value="new" @selected($customerMode === 'new')>Nuovo cliente</option>
+            </select>
         </div>
 
+        <div class="admin-field" data-customer-panel="existing" @hidden($customerMode !== 'existing')>
+            <label for="customer_id">Cliente esistente</label>
+            <select id="customer_id" name="customer_id" @required($customerMode === 'existing')>
+                <option value="">Seleziona un cliente</option>
+                @foreach ($customers as $customer)
+                    <option value="{{ $customer->id }}" @selected((string) $currentCustomerId === (string) $customer->id)>
+                        {{ $customer->name }} · {{ $customer->email ?: 'email da inserire' }}
+                    </option>
+                @endforeach
+            </select>
+            <p class="admin-help">Nome ed email vengono recuperati dall'anagrafica.</p>
+        </div>
+
+        <div class="admin-grid-2" data-customer-panel="new" @hidden($customerMode !== 'new')>
+            <div class="admin-field">
+                <label for="new_customer_name">Nome nuovo cliente</label>
+                <input id="new_customer_name" type="text" name="new_customer_name"
+                    value="{{ old('new_customer_name') }}" @required($customerMode === 'new')>
+            </div>
+            <div class="admin-field">
+                <label for="new_customer_email">Email nuovo cliente</label>
+                <input id="new_customer_email" type="email" name="new_customer_email"
+                    value="{{ old('new_customer_email') }}" autocomplete="email" @required($customerMode === 'new')>
+            </div>
+        </div>
+    </section>
+
+    <section class="admin-card admin-form-section">
+        <h2>Contenuti del lavoro</h2>
+
         <div class="admin-field">
-            <label for="email">Email cliente</label>
-            <input id="email" type="email" name="email" value="{{ old('email', $client->email) }}" autocomplete="email" required>
-            <p class="admin-help">Determina in quale area privata sarà visibile il lavoro.</p>
+            <label for="name">Titolo lavoro</label>
+            <input id="name" type="text" name="name" value="{{ old('name', $client->name) }}" required>
         </div>
 
         <div class="admin-field">
@@ -149,4 +188,30 @@
         <button class="admin-btn primary" type="submit">Salva</button>
         <a class="admin-btn" href="{{ route('admin.clients.index') }}">Annulla</a>
     </div>
+
+    <script>
+        (() => {
+            const mode = document.querySelector('[data-customer-mode]');
+            const panels = document.querySelectorAll('[data-customer-panel]');
+
+            if (!mode || !panels.length) {
+                return;
+            }
+
+            const updateCustomerFields = () => {
+                panels.forEach(panel => {
+                    const isActive = panel.dataset.customerPanel === mode.value;
+                    panel.hidden = !isActive;
+
+                    panel.querySelectorAll('input, select').forEach(field => {
+                        field.required = isActive;
+                        field.disabled = !isActive;
+                    });
+                });
+            };
+
+            mode.addEventListener('change', updateCustomerFields);
+            updateCustomerFields();
+        })();
+    </script>
 </form>

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Mail\ClientWorkReady;
 use App\Models\Client;
+use App\Models\Customer;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
@@ -21,6 +22,7 @@ class ClientController extends Controller
     public function index(): View
     {
         $clients = Client::query()
+            ->with('customer')
             ->orderBy('sort_order')
             ->orderBy('name')
             ->get();
@@ -30,47 +32,62 @@ class ClientController extends Controller
 
     public function create(): View
     {
+        $customers = $this->customers();
+        $selectedCustomerId = request()->integer('customer');
+
         return view('admin.clients.create', [
             'client' => new Client([
                 'is_published' => true,
                 'is_portal_visible' => true,
                 'sort_order' => 0,
             ]),
+            'customers' => $customers,
+            'defaultCustomerMode' => $customers->isEmpty() ? 'new' : 'existing',
+            'selectedCustomerId' => $customers->contains('id', $selectedCustomerId)
+                ? $selectedCustomerId
+                : null,
         ]);
     }
 
     public function store(Request $request): RedirectResponse
     {
         $data = $this->validatedClientData($request);
+        $customer = $this->resolveCustomer($data);
         $data['slug'] = $this->uniqueSlug($data['slug'] ?? $data['name']);
-        $data['email'] = strtolower(trim($data['email']));
+        $data['customer_id'] = $customer->getKey();
         $data['is_published'] = $request->boolean('is_published');
         $data['is_portal_visible'] = $request->boolean('is_portal_visible');
-        unset($data['send_notification']);
+        $this->removeCustomerFields($data);
         $data['photo_image'] = $request->file('photo_image')->store('clients', 'public');
         $data['cover_image'] = $request->file('cover_image')->store('clients', 'public');
 
         $client = Client::create($data);
         $this->storeGalleryImages($request, $client);
 
-        return $this->savedResponse($request, $client, 'Cliente creato.');
+        return $this->savedResponse($request, $client, 'Lavoro creato.');
     }
 
     public function edit(Client $client): View
     {
-        $client->load('images');
+        $client->load(['customer', 'images']);
 
-        return view('admin.clients.edit', compact('client'));
+        return view('admin.clients.edit', [
+            'client' => $client,
+            'customers' => $this->customers(),
+            'defaultCustomerMode' => 'existing',
+            'selectedCustomerId' => $client->customer_id,
+        ]);
     }
 
     public function update(Request $request, Client $client): RedirectResponse
     {
         $data = $this->validatedClientData($request, $client);
+        $customer = $this->resolveCustomer($data);
         $data['slug'] = $this->uniqueSlug($data['slug'] ?? $data['name'], $client);
-        $data['email'] = strtolower(trim($data['email']));
+        $data['customer_id'] = $customer->getKey();
         $data['is_published'] = $request->boolean('is_published');
         $data['is_portal_visible'] = $request->boolean('is_portal_visible');
-        unset($data['send_notification']);
+        $this->removeCustomerFields($data);
 
         if ($request->hasFile('photo_image')) {
             $this->deleteStoredFile($client->photo_image);
@@ -87,7 +104,7 @@ class ClientController extends Controller
         $this->deleteGalleryImages($request, $client);
         $this->storeGalleryImages($request, $client);
 
-        return $this->savedResponse($request, $client, 'Cliente aggiornato.');
+        return $this->savedResponse($request, $client, 'Lavoro aggiornato.');
     }
 
     public function destroy(Client $client): RedirectResponse
@@ -105,14 +122,37 @@ class ClientController extends Controller
 
         return redirect()
             ->route('admin.clients.index')
-            ->with('status', 'Cliente eliminato.');
+            ->with('status', 'Lavoro eliminato.');
     }
 
     private function validatedClientData(Request $request, ?Client $client = null): array
     {
+        $request->merge([
+            'new_customer_email' => strtolower(trim((string) $request->input('new_customer_email'))),
+        ]);
+
         return $request->validate([
+            'customer_mode' => ['required', Rule::in(['existing', 'new'])],
+            'customer_id' => [
+                'nullable',
+                'required_if:customer_mode,existing',
+                'integer',
+                'exists:customers,id',
+            ],
+            'new_customer_name' => [
+                'nullable',
+                'required_if:customer_mode,new',
+                'string',
+                'max:255',
+            ],
+            'new_customer_email' => [
+                'nullable',
+                'required_if:customer_mode,new',
+                'email',
+                'max:255',
+                Rule::unique('customers', 'email'),
+            ],
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'email', 'max:255'],
             'slug' => [
                 'nullable',
                 'string',
@@ -212,8 +252,19 @@ class ClientController extends Controller
             return $redirect->with('status', $successMessage);
         }
 
+        $client->loadMissing('customer');
+
+        if (! $client->customer?->email) {
+            return $redirect
+                ->with('status', $successMessage)
+                ->with(
+                    'status_error',
+                    'Email non inviata: completa prima l’indirizzo nell’anagrafica del cliente.',
+                );
+        }
+
         try {
-            Mail::to($client->email)->send(
+            Mail::to($client->customer->email)->send(
                 new ClientWorkReady($client, $this->clientAccessUrl($client)),
             );
 
@@ -235,12 +286,14 @@ class ClientController extends Controller
 
     private function clientAccessUrl(Client $client): ?string
     {
+        $client->loadMissing('customer');
+
         if ($client->is_portal_visible) {
             return URL::temporarySignedRoute(
                 'client-area.authenticate',
                 now()->addDays(7),
                 [
-                    'token' => Crypt::encryptString($client->email),
+                    'token' => Crypt::encryptString($client->customer->email),
                     'client' => $client->getKey(),
                 ],
             );
@@ -249,5 +302,34 @@ class ClientController extends Controller
         return $client->is_published
             ? route('clienti.show', $client)
             : null;
+    }
+
+    private function resolveCustomer(array $data): Customer
+    {
+        if ($data['customer_mode'] === 'existing') {
+            return Customer::findOrFail($data['customer_id']);
+        }
+
+        return Customer::create([
+            'name' => $data['new_customer_name'],
+            'email' => $data['new_customer_email'],
+        ]);
+    }
+
+    private function removeCustomerFields(array &$data): void
+    {
+        unset(
+            $data['customer_mode'],
+            $data['new_customer_name'],
+            $data['new_customer_email'],
+            $data['send_notification'],
+        );
+    }
+
+    private function customers()
+    {
+        return Customer::query()
+            ->orderBy('name')
+            ->get();
     }
 }

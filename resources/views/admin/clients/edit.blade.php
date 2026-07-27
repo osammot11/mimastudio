@@ -1,8 +1,8 @@
 @extends('layouts.admin')
 
-@section('title', 'Modifica cliente - Mima Studio')
-@section('page-title', 'Modifica cliente')
-@section('eyebrow', 'Clienti')
+@section('title', 'Modifica lavoro - Mima Studio')
+@section('page-title', 'Modifica lavoro')
+@section('eyebrow', 'Lavori clienti')
 
 @section('actions')
     @if ($client->is_published)

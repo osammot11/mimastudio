@@ -1,29 +1,29 @@
 @extends('layouts.admin')
 
-@section('title', 'Admin Clienti - Mima Studio')
-@section('page-title', 'Clienti')
+@section('title', 'Lavori clienti - Mima Studio')
+@section('page-title', 'Lavori clienti')
 @section('eyebrow', 'Contenuti')
 
 @section('actions')
     <a class="admin-btn" href="{{ route('clienti') }}" target="_blank">Vedi pagina</a>
-    <a class="admin-btn primary" href="{{ route('admin.clients.create') }}">Nuovo cliente</a>
+    <a class="admin-btn primary" href="{{ route('admin.clients.create') }}">Nuovo lavoro</a>
 @endsection
 
 @section('content')
     <section class="admin-card">
         <div class="admin-card-header">
             <div>
-                <h2>Clienti</h2>
-                <p class="admin-meta">{{ $clients->count() }} elementi totali</p>
+                <h2>Lavori</h2>
+                <p class="admin-meta">{{ $clients->count() }} lavori totali</p>
             </div>
-            <a class="admin-link" href="{{ route('admin.portfolio.index') }}">Gestisci portfolio</a>
+            <a class="admin-link" href="{{ route('admin.customers.index') }}">Apri anagrafica clienti</a>
         </div>
 
         @if ($clients->isNotEmpty())
             <div class="admin-table">
                 <div class="admin-table-head">
                     <span>Foto</span>
-                    <span>Cliente</span>
+                    <span>Lavoro</span>
                     <span>Stato</span>
                     <span>Ordine</span>
                     <span>Azioni</span>
@@ -45,7 +45,9 @@
                             <p class="admin-meta">
                                 {{ $client->category ?: 'Senza categoria' }} · {{ $client->client_date ? $client->client_date->format('d/m/Y') : 'Senza data' }}
                             </p>
-                            <p class="admin-meta">{{ $client->email ?: 'Email da inserire' }}</p>
+                            <p class="admin-meta">
+                                {{ $client->customer->name }} · {{ $client->customer->email ?: 'email da inserire' }}
+                            </p>
                         </div>
                         <span @class([
                             'admin-status',
@@ -70,7 +72,7 @@
                 @endforeach
             </div>
         @else
-            <div class="admin-empty">Nessun cliente inserito.</div>
+            <div class="admin-empty">Nessun lavoro inserito.</div>
         @endif
     </section>
 @endsection

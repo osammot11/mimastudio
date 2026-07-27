@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Client;
 use App\Models\ClientImage;
+use App\Models\Customer;
 use App\Models\PortfolioProject;
 use App\Models\PortfolioProjectImage;
 use App\Models\User;
@@ -73,9 +74,15 @@ class DatabaseSeeder extends Seeder
         ];
 
         foreach ($clients as $index => [$name, $category, $description, $date]) {
+            $customer = Customer::updateOrCreate(
+                ['email' => Str::slug($name).'@example.com'],
+                ['name' => $name],
+            );
+
             $client = Client::updateOrCreate(
                 ['slug' => Str::slug($name)],
                 [
+                    'customer_id' => $customer->id,
                     'name' => $name,
                     'category' => $category,
                     'description' => $description,
@@ -84,6 +91,7 @@ class DatabaseSeeder extends Seeder
                     'cover_image' => 'images/portfolio-'.($index + 2).'.jpeg',
                     'sort_order' => $index + 1,
                     'is_published' => true,
+                    'is_portal_visible' => true,
                 ]
             );
 

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Mail\ClientPortalAccess;
 use App\Models\Client;
+use App\Models\Customer;
 use App\Models\WorkDelivery;
 use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Http\RedirectResponse;
@@ -67,6 +68,10 @@ class ClientPortalController extends Controller
 
         $request->session()->regenerate();
         $request->session()->put('client_portal_email', $email);
+        $request->session()->put(
+            'client_portal_customer_id',
+            Customer::query()->where('email', $email)->value('id'),
+        );
 
         $workDeliveryId = $request->integer('work_delivery');
 
@@ -89,9 +94,14 @@ class ClientPortalController extends Controller
     public function index(Request $request): View
     {
         $email = (string) $request->session()->get('client_portal_email');
+        $customerId = $request->session()->get('client_portal_customer_id');
         $clients = Client::query()
             ->portalVisible()
-            ->whereRaw('LOWER(email) = ?', [$email])
+            ->when(
+                $customerId,
+                fn ($query) => $query->where('customer_id', $customerId),
+                fn ($query) => $query->whereRaw('1 = 0'),
+            )
             ->orderBy('sort_order')
             ->orderByDesc('client_date')
             ->get();
@@ -107,10 +117,12 @@ class ClientPortalController extends Controller
     public function showClient(Request $request, Client $client): View
     {
         $email = (string) $request->session()->get('client_portal_email');
+        $customerId = $request->session()->get('client_portal_customer_id');
 
         abort_unless(
             $client->is_portal_visible
-                && $this->normalizeEmail((string) $client->email) === $email,
+                && $customerId
+                && $client->customer_id === (int) $customerId,
             404,
         );
 
@@ -134,6 +146,7 @@ class ClientPortalController extends Controller
     public function logout(Request $request): RedirectResponse
     {
         $request->session()->forget('client_portal_email');
+        $request->session()->forget('client_portal_customer_id');
         $request->session()->regenerateToken();
 
         return redirect()
@@ -153,7 +166,10 @@ class ClientPortalController extends Controller
     {
         return Client::query()
             ->portalVisible()
-            ->whereRaw('LOWER(email) = ?', [$email])
+            ->whereHas(
+                'customer',
+                fn ($query) => $query->where('email', $email),
+            )
             ->exists()
             || WorkDelivery::query()
                 ->whereRaw('LOWER(email) = ?', [$email])
@@ -165,7 +181,10 @@ class ClientPortalController extends Controller
         return Client::query()
             ->portalVisible()
             ->whereKey($id)
-            ->whereRaw('LOWER(email) = ?', [$email])
+            ->whereHas(
+                'customer',
+                fn ($query) => $query->where('email', $email),
+            )
             ->first();
     }
 
