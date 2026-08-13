@@ -7,7 +7,7 @@
 
     <title>@yield('title', 'Mima Studio')</title>
 
-    @vite('resources/css/app.css')
+    <link rel="stylesheet" href="{{ asset('css/style.css') }}?v={{ filemtime(public_path('css/style.css')) }}">
 </head>
 
 <body>
@@ -125,7 +125,7 @@
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/gsap.min.js"></script>
-    @vite('resources/js/app.js')
+    <script src="{{ asset('js/app.js') }}?v={{ filemtime(public_path('js/app.js')) }}"></script>
 </body>
 
 </html>

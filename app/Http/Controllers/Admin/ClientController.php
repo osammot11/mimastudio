@@ -57,6 +57,9 @@ class ClientController extends Controller
         $data['customer_id'] = $customer->getKey();
         $data['is_published'] = $request->boolean('is_published');
         $data['is_portal_visible'] = $request->boolean('is_portal_visible');
+        $data['video_url'] = $request->boolean('has_video')
+            ? ($data['video_url'] ?? null)
+            : null;
         $this->removeCustomerFields($data);
         $data['photo_image'] = $request->file('photo_image')->store('clients', 'public');
         $data['cover_image'] = $request->file('cover_image')->store('clients', 'public');
@@ -87,6 +90,9 @@ class ClientController extends Controller
         $data['customer_id'] = $customer->getKey();
         $data['is_published'] = $request->boolean('is_published');
         $data['is_portal_visible'] = $request->boolean('is_portal_visible');
+        $data['video_url'] = $request->boolean('has_video')
+            ? ($data['video_url'] ?? null)
+            : null;
         $this->removeCustomerFields($data);
 
         if ($request->hasFile('photo_image')) {
@@ -166,6 +172,18 @@ class ClientController extends Controller
             'is_published' => ['nullable', 'boolean'],
             'send_notification' => ['nullable', 'boolean'],
             'is_portal_visible' => ['nullable', 'boolean'],
+            'has_video' => ['nullable', 'boolean'],
+            'video_url' => [
+                'nullable',
+                'required_if:has_video,1',
+                'url:http,https',
+                'max:2048',
+            ],
+            'high_resolution_url' => [
+                'nullable',
+                'url:http,https',
+                'max:2048',
+            ],
             'photo_image' => [$client ? 'nullable' : 'required', 'image', 'max:4096'],
             'cover_image' => [$client ? 'nullable' : 'required', 'image', 'max:4096'],
             'gallery_images' => ['nullable', 'array'],
@@ -323,6 +341,7 @@ class ClientController extends Controller
             $data['new_customer_name'],
             $data['new_customer_email'],
             $data['send_notification'],
+            $data['has_video'],
         );
     }
 

@@ -91,9 +91,76 @@ class CustomerTest extends TestCase
         ])->assertSessionHas('status');
     }
 
+    public function test_admin_can_copy_a_valid_customer_portal_access_link(): void
+    {
+        $user = User::factory()->create();
+        $customer = Customer::create([
+            'name' => 'Mario Rossi',
+            'email' => 'mario@example.com',
+        ]);
+        Client::create([
+            'customer_id' => $customer->id,
+            'name' => 'Matrimonio',
+            'slug' => 'matrimonio-link-portale',
+            'description' => 'Servizio fotografico.',
+            'photo_image' => 'images/portfolio-1.jpeg',
+            'cover_image' => 'images/portfolio-2.jpeg',
+            'is_published' => false,
+            'is_portal_visible' => true,
+        ]);
+
+        $response = $this->actingAs($user)
+            ->get(route('admin.customer-access-links.index'))
+            ->assertOk()
+            ->assertSee('Mario Rossi')
+            ->assertSee('Copia link');
+
+        preg_match(
+            '/id="portal-link-'.$customer->id.'"[^>]+value="([^"]+)"/s',
+            $response->getContent(),
+            $matches,
+        );
+
+        $this->assertArrayHasKey(1, $matches);
+        $accessUrl = html_entity_decode($matches[1], ENT_QUOTES);
+
+        $this->get($accessUrl)
+            ->assertRedirect(route('client-area.index'))
+            ->assertSessionHas('client_portal_email', 'mario@example.com')
+            ->assertSessionHas('client_portal_customer_id', $customer->id);
+    }
+
+    public function test_portal_link_is_not_generated_without_private_content(): void
+    {
+        $user = User::factory()->create();
+        $customer = Customer::create([
+            'name' => 'Cliente senza portale',
+            'email' => 'nessun-portale@example.com',
+        ]);
+        Client::create([
+            'customer_id' => $customer->id,
+            'name' => 'Lavoro nascosto',
+            'slug' => 'lavoro-nascosto-portale',
+            'description' => 'Servizio fotografico.',
+            'photo_image' => 'images/portfolio-1.jpeg',
+            'cover_image' => 'images/portfolio-2.jpeg',
+            'is_published' => true,
+            'is_portal_visible' => false,
+        ]);
+
+        $this->actingAs($user)
+            ->get(route('admin.customer-access-links.index'))
+            ->assertOk()
+            ->assertSee('Non disponibile')
+            ->assertDontSee('portal-link-'.$customer->id, false);
+    }
+
     public function test_customer_admin_requires_authentication(): void
     {
         $this->get(route('admin.customers.index'))
+            ->assertRedirect(route('admin.login'));
+
+        $this->get(route('admin.customer-access-links.index'))
             ->assertRedirect(route('admin.login'));
     }
 }

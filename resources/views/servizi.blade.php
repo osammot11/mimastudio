@@ -74,7 +74,7 @@
             <div class="grid-2">
                 <div>
                     <img class="sticky"
-                        src="{{ asset('images/copertina-matrimonio.JPG') }}"
+                        src="{{ asset('images/foto-miche.jpg') }}"
                         style="width: 100%; border-radius: 8px;">
                 </div>
                 <div class="center-vertical">

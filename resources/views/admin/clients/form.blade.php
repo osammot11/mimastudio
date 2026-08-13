@@ -176,6 +176,40 @@
         </div>
     </section>
 
+    @php
+        $hasVideo = (bool) old('has_video', filled($client->video_url));
+    @endphp
+
+    <section class="admin-card admin-form-section">
+        <h2>Link di consegna</h2>
+
+        <div class="admin-field">
+            <label for="high_resolution_url">Lavoro completo in alta risoluzione</label>
+            <input id="high_resolution_url" type="url" name="high_resolution_url"
+                value="{{ old('high_resolution_url', $client->high_resolution_url) }}"
+                placeholder="https://we.tl/...">
+            <p class="admin-help">Link WeTransfer opzionale con tutte le fotografie in alta risoluzione.</p>
+        </div>
+
+        <label class="admin-toggle">
+            <input type="checkbox" name="has_video" value="1" data-video-toggle @checked($hasVideo)>
+            <span class="admin-toggle-control" aria-hidden="true"></span>
+            <span class="admin-toggle-copy">
+                <strong>Video disponibile</strong>
+                <small>Attiva per aggiungere il link WeTransfer dell'eventuale video.</small>
+            </span>
+        </label>
+
+        <div class="admin-field" data-video-panel @hidden(! $hasVideo)>
+            <label for="video_url">Link video</label>
+            <input id="video_url" type="url" name="video_url"
+                value="{{ old('video_url', $client->video_url) }}"
+                placeholder="https://we.tl/..."
+                @required($hasVideo)>
+            <p class="admin-help">Il link sarà inserito nella mail di notifica e nella pagina del lavoro.</p>
+        </div>
+    </section>
+
     @if ($errors->any())
         <div class="admin-errors">
             @foreach ($errors->all() as $error)
@@ -193,10 +227,9 @@
         (() => {
             const mode = document.querySelector('[data-customer-mode]');
             const panels = document.querySelectorAll('[data-customer-panel]');
-
-            if (!mode || !panels.length) {
-                return;
-            }
+            const videoToggle = document.querySelector('[data-video-toggle]');
+            const videoPanel = document.querySelector('[data-video-panel]');
+            const videoUrl = document.querySelector('#video_url');
 
             const updateCustomerFields = () => {
                 panels.forEach(panel => {
@@ -210,8 +243,25 @@
                 });
             };
 
-            mode.addEventListener('change', updateCustomerFields);
-            updateCustomerFields();
+            const updateVideoField = () => {
+                if (!videoToggle || !videoPanel || !videoUrl) {
+                    return;
+                }
+
+                videoPanel.hidden = !videoToggle.checked;
+                videoUrl.disabled = !videoToggle.checked;
+                videoUrl.required = videoToggle.checked;
+            };
+
+            if (mode && panels.length) {
+                mode.addEventListener('change', updateCustomerFields);
+                updateCustomerFields();
+            }
+
+            if (videoToggle) {
+                videoToggle.addEventListener('change', updateVideoField);
+                updateVideoField();
+            }
         })();
     </script>
 </form>

@@ -30,6 +30,16 @@
                         <p>{{ $client->client_date->format('d/m/Y') }}</p>
                     @endif
                     <p>{{ $client->description }}</p>
+                    @if ($client->video_url)
+                        <a class="btn-2" href="{{ $client->video_url }}" target="_blank" rel="noopener noreferrer">
+                            Guarda o scarica il video
+                        </a>
+                    @endif
+                    @if ($client->high_resolution_url)
+                        <a class="btn-2" href="{{ $client->high_resolution_url }}" target="_blank" rel="noopener noreferrer">
+                            Scarica il lavoro in alta risoluzione
+                        </a>
+                    @endif
                 </div>
             </div>
         </div>

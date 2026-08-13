@@ -37,6 +37,28 @@
                                     Michele ti contatterà con le indicazioni necessarie per consultarlo.
                                 </p>
                             @endif
+
+                            @if ($client->video_url)
+                                <p style="margin:28px 0 12px;font-size:16px;line-height:1.6;">
+                                    È disponibile anche il video del lavoro:
+                                </p>
+
+                                <a href="{{ $client->video_url }}"
+                                    style="display:inline-block;background:#ffffff;color:#111111;text-decoration:none;padding:13px 19px;font-size:16px;border:1px solid #111111;">
+                                    Guarda o scarica il video
+                                </a>
+                            @endif
+
+                            @if ($client->high_resolution_url)
+                                <p style="margin:28px 0 12px;font-size:16px;line-height:1.6;">
+                                    Puoi scaricare il lavoro fotografico completo in alta risoluzione:
+                                </p>
+
+                                <a href="{{ $client->high_resolution_url }}"
+                                    style="display:inline-block;background:#ffffff;color:#111111;text-decoration:none;padding:13px 19px;font-size:16px;border:1px solid #111111;">
+                                    Scarica il lavoro in alta risoluzione
+                                </a>
+                            @endif
                         </td>
                     </tr>
                 </table>

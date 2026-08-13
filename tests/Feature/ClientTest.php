@@ -93,6 +93,8 @@ class ClientTest extends TestCase
             'description' => 'Visible description',
             'photo_image' => 'images/portfolio-1.jpeg',
             'cover_image' => 'images/portfolio-2.jpeg',
+            'video_url' => 'https://we.tl/t-visible-video',
+            'high_resolution_url' => 'https://we.tl/t-visible-high-resolution',
             'sort_order' => 1,
             'is_published' => true,
         ]);
@@ -110,7 +112,9 @@ class ClientTest extends TestCase
 
         $this->get('/clienti/visible-client')
             ->assertOk()
-            ->assertSee('Visible Client');
+            ->assertSee('Visible Client')
+            ->assertSee('https://we.tl/t-visible-video')
+            ->assertSee('https://we.tl/t-visible-high-resolution');
 
         $this->get('/clienti/hidden-client')
             ->assertNotFound();
@@ -165,19 +169,83 @@ class ClientTest extends TestCase
             'sort_order' => 1,
             'send_notification' => '1',
             'is_portal_visible' => '1',
+            'has_video' => '1',
+            'video_url' => 'https://we.tl/t-notified-video',
+            'high_resolution_url' => 'https://we.tl/t-notified-high-resolution',
             'photo_image' => UploadedFile::fake()->image('photo.jpg'),
             'cover_image' => UploadedFile::fake()->image('cover.jpg'),
         ])->assertRedirect();
 
         Mail::assertSent(ClientWorkReady::class, function (ClientWorkReady $mail): bool {
+            $mail->assertSeeInHtml('https://we.tl/t-notified-video');
+            $mail->assertSeeInHtml('https://we.tl/t-notified-high-resolution');
+
             return $mail->hasTo('notify@example.com')
-                && str_contains((string) $mail->accessUrl, '/area-clienti/accesso');
+                && str_contains((string) $mail->accessUrl, '/area-clienti/accesso')
+                && $mail->client->video_url === 'https://we.tl/t-notified-video'
+                && $mail->client->high_resolution_url === 'https://we.tl/t-notified-high-resolution';
         });
 
         $this->assertDatabaseHas('customers', [
             'name' => 'Notified Customer',
             'email' => 'notify@example.com',
         ]);
+        $this->assertDatabaseHas('clients', [
+            'name' => 'Notified Work',
+            'video_url' => 'https://we.tl/t-notified-video',
+            'high_resolution_url' => 'https://we.tl/t-notified-high-resolution',
+        ]);
+    }
+
+    public function test_video_url_is_required_when_video_toggle_is_enabled(): void
+    {
+        Storage::fake('public');
+        $user = User::factory()->create();
+        $customer = $this->createCustomer('video-validation@example.com');
+
+        $this->actingAs($user)->post(route('admin.clients.store'), [
+            'customer_mode' => 'existing',
+            'customer_id' => $customer->id,
+            'name' => 'Video Work',
+            'description' => 'Lavoro con video.',
+            'sort_order' => 1,
+            'has_video' => '1',
+            'photo_image' => UploadedFile::fake()->image('photo.jpg'),
+            'cover_image' => UploadedFile::fake()->image('cover.jpg'),
+        ])->assertSessionHasErrors('video_url');
+
+        $this->assertDatabaseMissing('clients', [
+            'name' => 'Video Work',
+        ]);
+    }
+
+    public function test_disabling_video_toggle_removes_the_saved_url(): void
+    {
+        $user = User::factory()->create();
+        $customer = $this->createCustomer('video-remove@example.com');
+        $client = Client::create([
+            'customer_id' => $customer->id,
+            'name' => 'Video Client',
+            'slug' => 'video-client',
+            'description' => 'Video description',
+            'photo_image' => 'images/portfolio-1.jpeg',
+            'cover_image' => 'images/portfolio-2.jpeg',
+            'video_url' => 'https://we.tl/t-old-video',
+            'sort_order' => 1,
+            'is_published' => true,
+        ]);
+
+        $this->actingAs($user)->put(route('admin.clients.update', $client), [
+            'customer_mode' => 'existing',
+            'customer_id' => $customer->id,
+            'name' => $client->name,
+            'slug' => $client->slug,
+            'description' => $client->description,
+            'sort_order' => $client->sort_order,
+            'is_published' => '1',
+        ])->assertRedirect(route('admin.clients.edit', $client));
+
+        $this->assertNull($client->fresh()->video_url);
     }
 
     public function test_admin_can_make_a_client_private_only(): void

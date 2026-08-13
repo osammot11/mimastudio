@@ -592,3 +592,196 @@ if (lightbox && lightboxImage && lightboxClose && lightboxPrevious && lightboxNe
         }
     });
 }
+
+// Form contatti multi-step
+
+const contactForm = document.getElementById('contact-form');
+
+if (contactForm) {
+    const allSteps = Array.from(contactForm.querySelectorAll('[data-contact-step]'));
+    const weddingSteps = Array.from(contactForm.querySelectorAll('[data-wedding-step]'));
+    const projectInputs = Array.from(contactForm.querySelectorAll('input[name="tipo_progetto"]'));
+    const previousButton = contactForm.querySelector('[data-contact-prev]');
+    const nextButton = contactForm.querySelector('[data-contact-next]');
+    const submitButton = contactForm.querySelector('[data-contact-submit]');
+    const currentStepLabel = contactForm.querySelector('[data-step-current]');
+    const totalStepsLabel = contactForm.querySelector('[data-step-total]');
+    const progressBar = contactForm.querySelector('.contact-progress-line span');
+    const stepsContainer = contactForm.querySelector('.contact-steps');
+    const errorMessage = contactForm.querySelector('.contact-error');
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let activeSteps = [];
+    let currentStepIndex = 0;
+    let isAnimating = false;
+
+    function isWeddingSelected() {
+        const selectedProject = projectInputs.find(input => input.checked);
+        return selectedProject ? selectedProject.value === 'matrimoni' : false;
+    }
+
+    function refreshActiveSteps() {
+        const includeWeddingSteps = isWeddingSelected();
+
+        weddingSteps.forEach(step => {
+            step.disabled = !includeWeddingSteps;
+        });
+
+        activeSteps = allSteps.filter(step => includeWeddingSteps || !step.hasAttribute('data-wedding-step'));
+    }
+
+    function updateNavigation() {
+        const isFirstStep = currentStepIndex === 0;
+        const isLastStep = currentStepIndex === activeSteps.length - 1;
+        const progress = (currentStepIndex + 1) / activeSteps.length;
+
+        previousButton.hidden = isFirstStep;
+        nextButton.hidden = isLastStep;
+        submitButton.hidden = !isLastStep;
+        currentStepLabel.textContent = currentStepIndex + 1;
+        totalStepsLabel.textContent = activeSteps.length;
+
+        if (gsapInstance) {
+            gsapInstance.to(progressBar, {
+                scaleX: progress,
+                duration: reducedMotion ? 0.01 : 0.35,
+                ease: 'power3.out',
+            });
+        } else {
+            progressBar.style.transform = `scaleX(${progress})`;
+        }
+    }
+
+    function showStep(nextIndex, direction = 1) {
+        const currentStep = activeSteps[currentStepIndex];
+        const nextStep = activeSteps[nextIndex];
+
+        if (!currentStep || !nextStep || isAnimating) {
+            return;
+        }
+
+        errorMessage.textContent = '';
+        isAnimating = true;
+
+        if (!gsapInstance) {
+            currentStep.hidden = true;
+            currentStep.disabled = true;
+            currentStepIndex = nextIndex;
+            nextStep.hidden = false;
+            nextStep.disabled = false;
+            stepsContainer.style.height = `${nextStep.offsetHeight}px`;
+            updateNavigation();
+            isAnimating = false;
+            return;
+        }
+
+        nextStep.hidden = false;
+        nextStep.disabled = false;
+
+        gsapInstance.set(nextStep, {
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            x: direction * 42,
+            autoAlpha: 0,
+        });
+
+        const nextHeight = nextStep.offsetHeight;
+
+        gsapInstance.timeline({
+            defaults: {
+                duration: reducedMotion ? 0.01 : 0.38,
+                ease: 'power3.inOut',
+            },
+            onComplete: () => {
+                currentStep.hidden = true;
+                currentStep.disabled = true;
+                gsapInstance.set(nextStep, {
+                    clearProps: 'position,top,left,x,opacity,visibility',
+                });
+                currentStepIndex = nextIndex;
+                stepsContainer.style.height = `${nextStep.offsetHeight}px`;
+                updateNavigation();
+                isAnimating = false;
+            },
+        })
+            .to(currentStep, {
+                x: direction * -42,
+                autoAlpha: 0,
+            })
+            .to(stepsContainer, {
+                height: nextHeight,
+            }, 0)
+            .to(nextStep, {
+                x: 0,
+                autoAlpha: 1,
+            }, '-=0.22');
+    }
+
+    function validateCurrentStep() {
+        const step = activeSteps[currentStepIndex];
+        const fields = Array.from(step.querySelectorAll('input, select, textarea'));
+        const firstInvalidField = fields.find(field => !field.checkValidity());
+
+        if (!firstInvalidField) {
+            errorMessage.textContent = '';
+            return true;
+        }
+
+        errorMessage.textContent = 'Completa i campi richiesti prima di continuare.';
+        firstInvalidField.reportValidity();
+        firstInvalidField.focus();
+        return false;
+    }
+
+    projectInputs.forEach(input => {
+        input.addEventListener('change', () => {
+            refreshActiveSteps();
+            updateNavigation();
+        });
+    });
+
+    nextButton.addEventListener('click', () => {
+        if (validateCurrentStep()) {
+            showStep(currentStepIndex + 1, 1);
+        }
+    });
+
+    previousButton.addEventListener('click', () => {
+        showStep(currentStepIndex - 1, -1);
+    });
+
+    contactForm.addEventListener('keydown', event => {
+        if (event.key === 'Enter' && event.target.tagName !== 'TEXTAREA' && !submitButton.hidden) {
+            return;
+        }
+
+        if (event.key === 'Enter' && event.target.tagName !== 'TEXTAREA') {
+            event.preventDefault();
+
+            if (validateCurrentStep()) {
+                showStep(currentStepIndex + 1, 1);
+            }
+        }
+    });
+
+    contactForm.addEventListener('submit', event => {
+        if (!validateCurrentStep()) {
+            event.preventDefault();
+        }
+    });
+
+    window.addEventListener('resize', () => {
+        if (!isAnimating) {
+            stepsContainer.style.height = `${activeSteps[currentStepIndex].offsetHeight}px`;
+        }
+    });
+
+    refreshActiveSteps();
+    allSteps.forEach((step, index) => {
+        const isFirstStep = index === 0;
+        step.hidden = !isFirstStep;
+        step.disabled = !isFirstStep;
+    });
+    stepsContainer.style.height = `${activeSteps[0].offsetHeight}px`;
+    updateNavigation();
+}

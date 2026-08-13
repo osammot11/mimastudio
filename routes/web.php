@@ -53,6 +53,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::resource('clients', AdminClientController::class)
             ->parameters(['clients' => 'client'])
             ->except(['show']);
+        Route::get('customer-access-links', [AdminCustomerController::class, 'accessLinks'])
+            ->name('customer-access-links.index');
         Route::resource('customers', AdminCustomerController::class)
             ->except(['show', 'destroy']);
         Route::resource('contact-requests', AdminContactRequestController::class)

@@ -17,6 +17,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
     'client_date',
     'photo_image',
     'cover_image',
+    'video_url',
+    'high_resolution_url',
     'sort_order',
     'is_published',
     'is_portal_visible',

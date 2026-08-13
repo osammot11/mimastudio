@@ -138,13 +138,18 @@ select {
     letter-spacing: 0.08em;
 }
 
-.admin-topbar-actions,
-.admin-actions {
+.admin-topbar-actions {
     display: flex;
     align-items: center;
     justify-content: flex-end;
     gap: 10px;
     flex-wrap: wrap;
+}
+
+.admin-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
 }
 
 .admin-card {
@@ -182,6 +187,12 @@ select {
     padding: 12px 14px;
 }
 
+.admin-alert.error {
+    border-color: #e4c2c2;
+    background: #fff7f7;
+    color: var(--admin-danger);
+}
+
 .admin-table {
     display: grid;
 }
@@ -206,6 +217,35 @@ select {
 .admin-row {
     padding: 14px 20px;
     border-bottom: 1px solid var(--admin-border);
+}
+
+.admin-requests .admin-table-head,
+.admin-requests .admin-row {
+    grid-template-columns: 140px minmax(220px, 1fr) 150px 90px 170px;
+}
+
+.admin-deliveries .admin-table-head,
+.admin-deliveries .admin-row {
+    grid-template-columns: 120px minmax(220px, 1fr) 140px 110px 170px;
+}
+
+.admin-customers .admin-table-head,
+.admin-customers .admin-row {
+    grid-template-columns: minmax(180px, 1fr) minmax(220px, 1fr) 80px 240px;
+}
+
+.admin-portal-links .admin-table-head,
+.admin-portal-links .admin-row {
+    grid-template-columns: minmax(180px, 0.8fr) 100px minmax(280px, 1.5fr) 110px;
+}
+
+.admin-portal-links .admin-field input {
+    font-size: 13px;
+}
+
+.admin-customer-work {
+    grid-template-columns: minmax(0, 1fr) auto;
+    padding: 12px 0;
 }
 
 .admin-row:last-child {
@@ -257,6 +297,11 @@ select {
     color: #7c3d28;
 }
 
+.admin-status.is-failed {
+    background: #fff0f0;
+    color: var(--admin-danger);
+}
+
 .admin-btn,
 .admin-link,
 .admin-danger {
@@ -294,6 +339,10 @@ select {
     gap: 18px;
 }
 
+.admin-form [hidden] {
+    display: none !important;
+}
+
 .admin-form-section {
     display: grid;
     gap: 16px;
@@ -316,7 +365,8 @@ select {
 }
 
 .admin-field input,
-.admin-field textarea {
+.admin-field textarea,
+.admin-field select {
     width: 100%;
     border: 1px solid var(--admin-border);
     border-radius: 6px;
@@ -329,8 +379,19 @@ select {
     resize: vertical;
 }
 
+.admin-break-word {
+    overflow-wrap: anywhere;
+}
+
+.admin-error-text {
+    margin: 0;
+    color: var(--admin-danger);
+    overflow-wrap: anywhere;
+}
+
 .admin-field input:focus,
-.admin-field textarea:focus {
+.admin-field textarea:focus,
+.admin-field select:focus {
     border-color: var(--admin-accent);
     outline: 2px solid rgba(44, 95, 85, 0.16);
 }
@@ -343,6 +404,68 @@ select {
 
 .admin-check input {
     width: auto;
+}
+
+.admin-toggle {
+    display: grid;
+    grid-template-columns: 52px minmax(0, 1fr);
+    gap: 12px;
+    align-items: center;
+    width: fit-content;
+    cursor: pointer;
+}
+
+.admin-toggle input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+}
+
+.admin-toggle-control {
+    position: relative;
+    width: 52px;
+    height: 30px;
+    border-radius: 999px;
+    background: #c7c7cc;
+    transition: background-color 0.2s ease;
+}
+
+.admin-toggle-control::after {
+    content: "";
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: #ffffff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.28);
+    transition: transform 0.2s ease;
+}
+
+.admin-toggle input:checked + .admin-toggle-control {
+    background: #34c759;
+}
+
+.admin-toggle input:checked + .admin-toggle-control::after {
+    transform: translateX(22px);
+}
+
+.admin-toggle input:focus-visible + .admin-toggle-control {
+    outline: 3px solid rgba(52, 199, 89, 0.28);
+    outline-offset: 2px;
+}
+
+.admin-toggle-copy {
+    display: grid;
+    gap: 2px;
+}
+
+.admin-toggle-copy small {
+    max-width: 560px;
+    color: var(--admin-muted);
+    font-weight: 400;
 }
 
 .admin-media-field {
@@ -434,6 +557,10 @@ select {
     }
 
     .admin-row,
+    .admin-requests .admin-row,
+    .admin-deliveries .admin-row,
+    .admin-customers .admin-row,
+    .admin-portal-links .admin-row,
     .admin-gallery-row,
     .admin-media-field,
     .admin-grid-2 {

@@ -89,7 +89,9 @@ class ClientPortalTest extends TestCase
             ->get(route('client-area.clients.show', $client))
             ->assertOk()
             ->assertSee('GALLERIA PRIVATA')
-            ->assertSee($client->description);
+            ->assertSee($client->description)
+            ->assertSee($client->video_url)
+            ->assertSee($client->high_resolution_url);
 
         $this->withSession($this->portalSession($client))
             ->get(route('client-area.clients.show', $otherClient))
@@ -217,6 +219,8 @@ class ClientPortalTest extends TestCase
             'description' => 'Galleria fotografica privata.',
             'photo_image' => 'images/portfolio-1.jpeg',
             'cover_image' => 'images/portfolio-2.jpeg',
+            'video_url' => 'https://we.tl/t-'.$slug,
+            'high_resolution_url' => 'https://we.tl/high-resolution-'.$slug,
             'sort_order' => 1,
             'is_published' => $isPublished,
             'is_portal_visible' => $isPortalVisible,

@@ -4,8 +4,11 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Customer;
+use App\Models\WorkDelivery;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
@@ -26,6 +29,39 @@ class CustomerController extends Controller
         return view('admin.customers.create', [
             'customer' => new Customer,
         ]);
+    }
+
+    public function accessLinks(): View
+    {
+        $expiresAt = now()->addDays(7);
+        $deliveryCounts = WorkDelivery::query()
+            ->get(['email'])
+            ->countBy(fn (WorkDelivery $delivery): string => $this->normalizeEmail($delivery->email));
+        $customers = Customer::query()
+            ->withCount([
+                'works as portal_works_count' => fn ($query) => $query->portalVisible(),
+            ])
+            ->orderBy('name')
+            ->get()
+            ->each(function (Customer $customer) use ($deliveryCounts, $expiresAt): void {
+                $email = $this->normalizeEmail((string) $customer->email);
+                $deliveryCount = $deliveryCounts->get($email, 0);
+                $contentCount = $customer->portal_works_count + $deliveryCount;
+
+                $customer->setAttribute('portal_content_count', $contentCount);
+                $customer->setAttribute(
+                    'portal_access_url',
+                    $email && $contentCount > 0
+                        ? URL::temporarySignedRoute(
+                            'client-area.authenticate',
+                            $expiresAt,
+                            ['token' => Crypt::encryptString($email)],
+                        )
+                        : null,
+                );
+            });
+
+        return view('admin.customers.access-links', compact('customers', 'expiresAt'));
     }
 
     public function store(Request $request): RedirectResponse
@@ -68,5 +104,10 @@ class CustomerController extends Controller
                 Rule::unique('customers', 'email')->ignore($customer),
             ],
         ]);
+    }
+
+    private function normalizeEmail(string $email): string
+    {
+        return strtolower(trim($email));
     }
 }

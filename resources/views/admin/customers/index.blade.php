@@ -5,6 +5,7 @@
 @section('eyebrow', 'Clienti')
 
 @section('actions')
+    <a class="admin-btn" href="{{ route('admin.customer-access-links.index') }}">Link area clienti</a>
     <a class="admin-btn primary" href="{{ route('admin.customers.create') }}">Nuovo cliente</a>
 @endsection
 

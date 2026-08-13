@@ -9,13 +9,21 @@ class ExampleTest extends TestCase
 {
     use RefreshDatabase;
 
-    /**
-     * A basic test example.
-     */
-    public function test_the_application_returns_a_successful_response(): void
+    public function test_the_application_uses_static_public_assets(): void
     {
-        $response = $this->get('/');
+        $this->assertFileExists(public_path('css/style.css'));
+        $this->assertFileExists(public_path('css/admin.css'));
+        $this->assertFileExists(public_path('js/app.js'));
 
-        $response->assertStatus(200);
+        $this->get('/')
+            ->assertOk()
+            ->assertSee(asset('css/style.css'), false)
+            ->assertSee(asset('js/app.js'), false)
+            ->assertDontSee('build/assets', false);
+
+        $this->get(route('admin.login'))
+            ->assertOk()
+            ->assertSee(asset('css/admin.css'), false)
+            ->assertDontSee('build/assets', false);
     }
 }
