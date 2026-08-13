@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Middleware\EnsureClientPortalAccess;
+use App\Http\Middleware\EnsureSiteAccess;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -16,6 +17,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->redirectGuestsTo(fn () => route('admin.login'));
         $middleware->alias([
             'client.portal' => EnsureClientPortalAccess::class,
+            'site.access' => EnsureSiteAccess::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

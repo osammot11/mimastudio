@@ -10,18 +10,27 @@ use App\Http\Controllers\ClientController;
 use App\Http\Controllers\ClientPortalController;
 use App\Http\Controllers\ContactRequestController;
 use App\Http\Controllers\PortfolioController;
+use App\Http\Controllers\SiteAccessController;
 use Illuminate\Support\Facades\Route;
 
-Route::view('/contatti', 'contatti')->name('contatti');
-Route::post('/contatti', [ContactRequestController::class, 'store'])->name('contatti.store');
-Route::view('/servizi', 'servizi')->name('servizi');
-Route::get('/clienti', [ClientController::class, 'index'])->name('clienti');
-Route::get('/clienti/{client}', [ClientController::class, 'show'])->name('clienti.show');
-Route::get('/', [PortfolioController::class, 'home'])->name('home');
-Route::get('/portfolio', [PortfolioController::class, 'index'])->name('portfolio');
-Route::get('/portfolio/{portfolioProject}', [PortfolioController::class, 'show'])->name('portfolio.show');
-Route::view('/privacy-policy', 'privacy-policy')->name('privacy-policy');
-Route::view('/cookie-policy', 'cookie-policy')->name('cookie-policy');
+Route::get('/accesso-sito', [SiteAccessController::class, 'show'])->name('site-access.show');
+Route::post('/accesso-sito', [SiteAccessController::class, 'authenticate'])
+    ->middleware('throttle:10,1')
+    ->name('site-access.authenticate');
+
+Route::middleware('site.access')->group(function () {
+    Route::view('/contatti', 'contatti')->name('contatti');
+    Route::post('/contatti', [ContactRequestController::class, 'store'])->name('contatti.store');
+    Route::view('/servizi', 'servizi')->name('servizi');
+    Route::get('/clienti', [ClientController::class, 'index'])->name('clienti');
+    Route::get('/clienti/{client}', [ClientController::class, 'show'])->name('clienti.show');
+    Route::get('/', [PortfolioController::class, 'home'])->name('home');
+    Route::get('/portfolio', [PortfolioController::class, 'index'])->name('portfolio');
+    Route::get('/portfolio/{portfolioProject}', [PortfolioController::class, 'show'])->name('portfolio.show');
+    Route::view('/privacy-policy', 'privacy-policy')->name('privacy-policy');
+    Route::view('/cookie-policy', 'cookie-policy')->name('cookie-policy');
+});
+
 Route::redirect('/login', '/admin/login')->name('login');
 
 Route::prefix('area-clienti')->name('client-area.')->group(function () {
