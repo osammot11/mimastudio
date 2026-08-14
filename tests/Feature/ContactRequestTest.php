@@ -2,14 +2,25 @@
 
 namespace Tests\Feature;
 
+use App\Mail\ContactRequestReceived;
 use App\Models\ContactRequest;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Mail;
+use RuntimeException;
 use Tests\TestCase;
 
 class ContactRequestTest extends TestCase
 {
     use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        Mail::fake();
+        config(['mail.contact_recipient' => 'info@michelemariani.it']);
+    }
 
     public function test_standard_contact_request_is_saved(): void
     {
@@ -29,6 +40,11 @@ class ContactRequestTest extends TestCase
             'project_type' => 'ritratti',
             'wedding_date' => null,
         ]);
+
+        Mail::assertSent(ContactRequestReceived::class, function (ContactRequestReceived $mail): bool {
+            return $mail->hasTo('info@michelemariani.it')
+                && $mail->hasReplyTo('mario@example.com', 'Mario Rossi');
+        });
     }
 
     public function test_wedding_contact_request_saves_all_details(): void
@@ -59,6 +75,12 @@ class ContactRequestTest extends TestCase
         $this->assertSame('12/06/2027', $contactRequest->wedding_date->format('d/m/Y'));
         $this->assertSame(['Preparazione sposa', 'Preparazione sposo'], $contactRequest->additional_services);
         $this->assertSame(['Servizio Polaroid'], $contactRequest->premium_services);
+
+        Mail::assertSent(ContactRequestReceived::class, function (ContactRequestReceived $mail): bool {
+            return $mail->hasTo('info@michelemariani.it')
+                && str_contains($mail->render(), 'Villa Test')
+                && str_contains($mail->render(), 'Servizio Polaroid');
+        });
     }
 
     public function test_wedding_fields_are_required_only_for_weddings(): void
@@ -82,6 +104,29 @@ class ContactRequestTest extends TestCase
             ]);
 
         $this->assertDatabaseEmpty('contact_requests');
+        Mail::assertNothingSent();
+    }
+
+    public function test_request_is_preserved_when_email_delivery_fails(): void
+    {
+        Mail::shouldReceive('to')
+            ->once()
+            ->with('info@michelemariani.it')
+            ->andThrow(new RuntimeException('SMTP non disponibile'));
+
+        $this->post('/contatti', [
+            'nome_completo' => 'Mario Rossi',
+            'email' => 'MARIO@Example.com',
+            'telefono' => '3331234567',
+            'tipo_progetto' => 'ritratti',
+            'messaggio' => 'Vorrei organizzare un servizio fotografico.',
+            'privacy' => '1',
+        ])->assertRedirect('/contatti')
+            ->assertSessionHas('contact_warning');
+
+        $this->assertDatabaseHas('contact_requests', [
+            'email' => 'mario@example.com',
+        ]);
     }
 
     public function test_admin_can_read_contact_requests(): void

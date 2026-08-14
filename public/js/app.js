@@ -46,6 +46,21 @@ const navbarContent = document.getElementById('mobile-navbar-content');
 const navbarLinks = navbarContent ? navbarContent.querySelectorAll('a') : [];
 const gsapInstance = window.gsap;
 
+const clientLogoTrack = document.querySelector('[data-client-logo-track]');
+
+if (clientLogoTrack && gsapInstance) {
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    if (!reducedMotion) {
+        gsapInstance.to(clientLogoTrack, {
+            xPercent: -50,
+            duration: 28,
+            ease: 'none',
+            repeat: -1,
+        });
+    }
+}
+
 if (menuButton && navbarContent && gsapInstance) {
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const animationDuration = reducedMotion ? 0.01 : 0.45;
@@ -664,7 +679,6 @@ if (contactForm) {
 
         if (!gsapInstance) {
             currentStep.hidden = true;
-            currentStep.disabled = true;
             currentStepIndex = nextIndex;
             nextStep.hidden = false;
             nextStep.disabled = false;
@@ -694,7 +708,6 @@ if (contactForm) {
             },
             onComplete: () => {
                 currentStep.hidden = true;
-                currentStep.disabled = true;
                 gsapInstance.set(nextStep, {
                     clearProps: 'position,top,left,x,opacity,visibility',
                 });

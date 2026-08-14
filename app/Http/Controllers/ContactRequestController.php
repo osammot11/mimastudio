@@ -2,15 +2,22 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\ContactRequestReceived;
 use App\Models\ContactRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\Rule;
+use Throwable;
 
 class ContactRequestController extends Controller
 {
     public function store(Request $request): RedirectResponse
     {
+        $request->merge([
+            'email' => strtolower(trim((string) $request->input('email'))),
+        ]);
+
         $isWedding = $request->input('tipo_progetto') === 'matrimoni';
 
         $data = $request->validate([
@@ -61,7 +68,7 @@ class ContactRequestController extends Controller
             'privacy' => ['accepted'],
         ]);
 
-        ContactRequest::create([
+        $contactRequest = ContactRequest::create([
             'full_name' => $data['nome_completo'],
             'email' => $data['email'],
             'phone' => $data['telefono'],
@@ -81,6 +88,21 @@ class ContactRequestController extends Controller
             'ip_address' => $request->ip(),
             'user_agent' => $request->userAgent(),
         ]);
+
+        try {
+            Mail::to(config('mail.contact_recipient'))->send(
+                new ContactRequestReceived($contactRequest),
+            );
+        } catch (Throwable $exception) {
+            report($exception);
+
+            return redirect()
+                ->route('contatti')
+                ->with(
+                    'contact_warning',
+                    'La richiesta è stata registrata, ma la notifica email non è partita. Puoi scrivermi direttamente a info@michelemariani.it.',
+                );
+        }
 
         return redirect()
             ->route('contatti')

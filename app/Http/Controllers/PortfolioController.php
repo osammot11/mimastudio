@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Customer;
 use App\Models\PortfolioProject;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -18,7 +19,13 @@ class PortfolioController extends Controller
             ->limit(6)
             ->get();
 
-        return view('home', compact('projects'));
+        $customersWithLogos = Customer::query()
+            ->whereNotNull('logo_path')
+            ->where('logo_path', '!=', '')
+            ->orderBy('name')
+            ->get(['id', 'name', 'logo_path']);
+
+        return view('home', compact('projects', 'customersWithLogos'));
     }
 
     public function index(Request $request): View

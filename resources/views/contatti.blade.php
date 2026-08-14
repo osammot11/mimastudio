@@ -20,7 +20,7 @@
             <div class="stack-xl">
                 <div class="stack-mid bottom-line">
                     <p class="pill">EMAIL</p>
-                    <h3>info@mimastudio.it</h3>
+                    <h3><a href="mailto:info@michelemariani.it">info@michelemariani.it</a></h3>
                 </div>
 
                 <div class="stack-mid bottom-line">
@@ -67,6 +67,12 @@
                     <div class="contact-success" role="status">
                         <p class="pill">RICHIESTA RICEVUTA</p>
                         <h4>{{ session('contact_success') }}</h4>
+                    </div>
+                @endif
+
+                @if (session('contact_warning'))
+                    <div class="contact-server-errors" role="alert">
+                        <p>{{ session('contact_warning') }}</p>
                     </div>
                 @endif
 

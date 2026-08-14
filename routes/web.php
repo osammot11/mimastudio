@@ -20,7 +20,9 @@ Route::post('/accesso-sito', [SiteAccessController::class, 'authenticate'])
 
 Route::middleware('site.access')->group(function () {
     Route::view('/contatti', 'contatti')->name('contatti');
-    Route::post('/contatti', [ContactRequestController::class, 'store'])->name('contatti.store');
+    Route::post('/contatti', [ContactRequestController::class, 'store'])
+        ->middleware('throttle:5,1')
+        ->name('contatti.store');
     Route::view('/servizi', 'servizi')->name('servizi');
     Route::get('/clienti', [ClientController::class, 'index'])->name('clienti');
     Route::get('/clienti/{client}', [ClientController::class, 'show'])->name('clienti.show');

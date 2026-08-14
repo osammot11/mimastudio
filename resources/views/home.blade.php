@@ -99,6 +99,30 @@
             </div>
         </section>
 
+        @if ($customersWithLogos->isNotEmpty())
+            <section class="section-small bottom-line client-logos-section">
+                <div class="text-container-center center-items center-text stack-mid">
+                    <p class="pill">CLIENTI</p>
+                    <h2>Persone e realtà con cui ho lavorato.</h2>
+                </div>
+
+                <div class="client-logo-marquee top-margin" aria-label="Loghi dei clienti">
+                    <div class="client-logo-track" data-client-logo-track>
+                        <div class="client-logo-group">
+                            @foreach ($customersWithLogos as $customer)
+                                <img class="client-logo" src="{{ $customer->logoUrl() }}" alt="{{ $customer->name }}">
+                            @endforeach
+                        </div>
+                        <div class="client-logo-group" aria-hidden="true">
+                            @foreach ($customersWithLogos as $customer)
+                                <img class="client-logo" src="{{ $customer->logoUrl() }}" alt="">
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
+            </section>
+        @endif
+
         <section class="section-xl-padding bottom-line">
             <div class="wrapper grid-2">
                 <div class="stack-large">

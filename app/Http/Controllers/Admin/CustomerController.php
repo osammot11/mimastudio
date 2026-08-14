@@ -8,6 +8,7 @@ use App\Models\WorkDelivery;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
@@ -66,7 +67,13 @@ class CustomerController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
-        $customer = Customer::create($this->validatedData($request));
+        $data = $this->validatedData($request);
+
+        if ($request->hasFile('logo')) {
+            $data['logo_path'] = $request->file('logo')->store('customer-logos', 'public');
+        }
+
+        $customer = Customer::create($data);
 
         return redirect()
             ->route('admin.customers.edit', $customer)
@@ -82,7 +89,17 @@ class CustomerController extends Controller
 
     public function update(Request $request, Customer $customer): RedirectResponse
     {
-        $customer->update($this->validatedData($request, $customer));
+        $data = $this->validatedData($request, $customer);
+
+        if ($request->hasFile('logo')) {
+            $this->deleteLogo($customer->logo_path);
+            $data['logo_path'] = $request->file('logo')->store('customer-logos', 'public');
+        } elseif ($request->boolean('remove_logo')) {
+            $this->deleteLogo($customer->logo_path);
+            $data['logo_path'] = null;
+        }
+
+        $customer->update($data);
 
         return redirect()
             ->route('admin.customers.edit', $customer)
@@ -95,7 +112,7 @@ class CustomerController extends Controller
             'email' => strtolower(trim((string) $request->input('email'))),
         ]);
 
-        return $request->validate([
+        $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => [
                 'required',
@@ -103,11 +120,24 @@ class CustomerController extends Controller
                 'max:255',
                 Rule::unique('customers', 'email')->ignore($customer),
             ],
+            'logo' => ['nullable', 'image', 'mimes:png', 'max:4096'],
+            'remove_logo' => ['nullable', 'boolean'],
         ]);
+
+        unset($validated['logo'], $validated['remove_logo']);
+
+        return $validated;
     }
 
     private function normalizeEmail(string $email): string
     {
         return strtolower(trim($email));
+    }
+
+    private function deleteLogo(?string $path): void
+    {
+        if ($path) {
+            Storage::disk('public')->delete($path);
+        }
     }
 }

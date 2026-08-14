@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Customer;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -25,5 +26,24 @@ class ExampleTest extends TestCase
             ->assertOk()
             ->assertSee(asset('css/admin.css'), false)
             ->assertDontSee('build/assets', false);
+    }
+
+    public function test_homepage_shows_only_customers_with_a_logo(): void
+    {
+        Customer::create([
+            'name' => 'Brand visibile',
+            'email' => 'logo@example.com',
+            'logo_path' => 'customer-logos/brand.png',
+        ]);
+        Customer::create([
+            'name' => 'Cliente senza logo',
+            'email' => 'senza-logo@example.com',
+        ]);
+
+        $this->get('/')
+            ->assertOk()
+            ->assertSee('Brand visibile')
+            ->assertSee('/storage/customer-logos/brand.png', false)
+            ->assertDontSee('Cliente senza logo');
     }
 }
