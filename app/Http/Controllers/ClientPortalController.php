@@ -7,6 +7,7 @@ use App\Models\Client;
 use App\Models\Customer;
 use App\Models\WorkDelivery;
 use Illuminate\Contracts\Encryption\DecryptException;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
@@ -126,9 +127,35 @@ class ClientPortalController extends Controller
             404,
         );
 
-        $client->load('images');
+        $galleryImages = $client->images()->cursorPaginate((int) config('gallery.page_size'));
 
-        return view('client-area.client', compact('client'));
+        return view('client-area.client', compact('client', 'galleryImages'));
+    }
+
+    public function gallery(Request $request, Client $client): JsonResponse
+    {
+        $customerId = $request->session()->get('client_portal_customer_id');
+
+        abort_unless(
+            $client->is_portal_visible
+                && $customerId
+                && $client->customer_id === (int) $customerId,
+            404,
+        );
+
+        $images = $client->images()->cursorPaginate((int) config('gallery.page_size'));
+
+        return response()->json([
+            'items' => collect($images->items())->map(fn ($image) => [
+                'id' => $image->getKey(),
+                'thumbnail_url' => $image->thumbnailUrl(),
+                'image_url' => $image->imageUrl(),
+                'alt' => $image->alt_text ?: $client->name,
+                'width' => $image->width,
+                'height' => $image->height,
+            ])->values(),
+            'next_cursor' => $images->nextCursor()?->encode(),
+        ]);
     }
 
     public function show(Request $request, WorkDelivery $workDelivery): View

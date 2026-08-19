@@ -495,6 +495,57 @@ select {
     background: var(--admin-surface-muted);
 }
 
+.admin-pagination,
+.admin-upload-summary,
+.admin-upload-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.admin-pagination {
+    padding-top: 6px;
+}
+
+.admin-btn.is-disabled {
+    opacity: 0.45;
+    pointer-events: none;
+}
+
+.admin-upload {
+    display: grid;
+    gap: 12px;
+    border: 1px solid var(--admin-border);
+    border-radius: 8px;
+    padding: 14px;
+    background: var(--admin-surface-muted);
+}
+
+.admin-upload[hidden] {
+    display: none;
+}
+
+.admin-upload-track {
+    height: 10px;
+    overflow: hidden;
+    border-radius: 5px;
+    background: var(--admin-border);
+}
+
+.admin-upload-track span {
+    display: block;
+    width: 0;
+    height: 100%;
+    background: #34c759;
+    transition: width 0.2s ease;
+}
+
+.admin-upload-actions {
+    justify-content: flex-start;
+}
+
 .admin-errors {
     border: 1px solid #e4c2c2;
     border-radius: 6px;

@@ -8,7 +8,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 #[Fillable([
     'image_path',
+    'thumbnail_path',
     'alt_text',
+    'original_name',
+    'byte_size',
+    'width',
+    'height',
     'sort_order',
 ])]
 class ClientImage extends Model
@@ -17,6 +22,9 @@ class ClientImage extends Model
     {
         return [
             'sort_order' => 'integer',
+            'byte_size' => 'integer',
+            'width' => 'integer',
+            'height' => 'integer',
         ];
     }
 
@@ -30,5 +38,16 @@ class ClientImage extends Model
         return str_starts_with($this->image_path, 'images/')
             ? asset($this->image_path)
             : '/storage/'.ltrim($this->image_path, '/');
+    }
+
+    public function thumbnailUrl(): string
+    {
+        if (! $this->thumbnail_path) {
+            return $this->imageUrl();
+        }
+
+        return str_starts_with($this->thumbnail_path, 'images/')
+            ? asset($this->thumbnail_path)
+            : '/storage/'.ltrim($this->thumbnail_path, '/');
     }
 }

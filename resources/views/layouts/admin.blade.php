@@ -8,6 +8,7 @@
     <title>@yield('title', 'Admin - Mima Studio')</title>
 
     <link rel="stylesheet" href="{{ asset('css/admin.css') }}?v={{ filemtime(public_path('css/admin.css')) }}">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 </head>
 
 <body class="admin-body">
@@ -64,6 +65,7 @@
             @yield('content')
         </main>
     </div>
+    <script src="{{ asset('js/admin-gallery.js') }}?v={{ filemtime(public_path('js/admin-gallery.js')) }}" defer></script>
 </body>
 
 </html>

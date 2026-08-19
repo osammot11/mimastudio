@@ -1,4 +1,4 @@
-<form class="admin-form" action="{{ $action }}" method="post" enctype="multipart/form-data">
+<form class="admin-form" action="{{ $action }}" method="post" enctype="multipart/form-data" data-client-form>
     @csrf
     @if ($method !== 'POST')
         @method($method)
@@ -22,7 +22,7 @@
             </select>
         </div>
 
-        <div class="admin-field" data-customer-panel="existing" @hidden($customerMode !== 'existing')>
+        <div class="admin-field" data-customer-panel="existing" @if ($customerMode !== 'existing') hidden @endif>
             <label for="customer_id">Cliente esistente</label>
             <select id="customer_id" name="customer_id" @required($customerMode === 'existing')>
                 <option value="">Seleziona un cliente</option>
@@ -35,7 +35,7 @@
             <p class="admin-help">Nome ed email vengono recuperati dall'anagrafica.</p>
         </div>
 
-        <div class="admin-grid-2" data-customer-panel="new" @hidden($customerMode !== 'new')>
+        <div class="admin-grid-2" data-customer-panel="new" @if ($customerMode !== 'new') hidden @endif>
             <div class="admin-field">
                 <label for="new_customer_name">Nome nuovo cliente</label>
                 <input id="new_customer_name" type="text" name="new_customer_name"
@@ -146,11 +146,18 @@
     <section class="admin-card admin-form-section">
         <h2>Gallery</h2>
 
-        @if ($client->exists && $client->images->isNotEmpty())
+        @if (isset($activeUploadSession) && $activeUploadSession)
+            <div class="admin-alert">
+                Caricamento incompleto: {{ $activeUploadSession->uploaded_files }} di {{ $activeUploadSession->expected_files }} immagini.
+                Riseleziona gli stessi file e premi Salva per riprenderlo, oppure seleziona altri file per poterlo annullare.
+            </div>
+        @endif
+
+        @if ($client->exists && isset($galleryImages) && $galleryImages->isNotEmpty())
             <div class="admin-gallery">
-            @foreach ($client->images as $image)
+            @foreach ($galleryImages as $image)
                 <div class="admin-gallery-row">
-                    <img src="{{ $image->imageUrl() }}" alt="{{ $image->alt_text ?: $client->name }}">
+                    <img src="{{ $image->thumbnailUrl() }}" alt="{{ $image->alt_text ?: $client->name }}" loading="lazy">
                     <div class="admin-field">
                         <label for="image_alt_{{ $image->id }}">Alt text</label>
                         <input id="image_alt_{{ $image->id }}" type="text" name="image_alt[{{ $image->id }}]" value="{{ old("image_alt.{$image->id}", $image->alt_text) }}">
@@ -166,14 +173,52 @@
                 </div>
             @endforeach
             </div>
+
+            @if ($galleryImages->hasPages())
+                <nav class="admin-pagination" aria-label="Pagine gallery">
+                    @if ($galleryImages->onFirstPage())
+                        <span class="admin-btn is-disabled">Precedente</span>
+                    @else
+                        <a class="admin-btn" href="{{ $galleryImages->previousPageUrl() }}">Precedente</a>
+                    @endif
+                    <span>Pagina {{ $galleryImages->currentPage() }} di {{ $galleryImages->lastPage() }}</span>
+                    @if ($galleryImages->hasMorePages())
+                        <a class="admin-btn" href="{{ $galleryImages->nextPageUrl() }}">Successiva</a>
+                    @else
+                        <span class="admin-btn is-disabled">Successiva</span>
+                    @endif
+                </nav>
+            @endif
         @else
             <p class="admin-help">Nessuna immagine gallery inserita.</p>
         @endif
 
         <div class="admin-field">
             <label for="gallery_images">Aggiungi immagini</label>
-            <input id="gallery_images" type="file" name="gallery_images[]" accept="image/*" multiple>
+            <input id="gallery_images" type="file" accept="image/jpeg,image/png,image/webp" multiple data-gallery-files>
+            <p class="admin-help">Massimo 1000 immagini, 4 MB ciascuna. Il caricamento può essere messo in pausa e ripreso.</p>
         </div>
+
+        <div class="admin-upload" data-gallery-uploader hidden>
+            <div class="admin-upload-summary">
+                <strong data-upload-title>Preparazione caricamento</strong>
+                <span data-upload-count>0 / 0</span>
+            </div>
+            <div class="admin-upload-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+                <span data-upload-progress></span>
+            </div>
+            <p class="admin-help" data-upload-detail></p>
+            <p class="admin-error-text" data-upload-error hidden></p>
+            <div class="admin-upload-actions">
+                <button class="admin-btn" type="button" data-upload-pause hidden>Pausa</button>
+                <button class="admin-btn" type="button" data-upload-resume hidden>Riprendi</button>
+                <button class="admin-danger" type="button" data-upload-cancel hidden>Annulla caricamento</button>
+            </div>
+        </div>
+
+        <noscript>
+            <div class="admin-errors"><p>JavaScript è necessario per caricare gallery numerose in sicurezza.</p></div>
+        </noscript>
     </section>
 
     @php
@@ -200,7 +245,7 @@
             </span>
         </label>
 
-        <div class="admin-field" data-video-panel @hidden(! $hasVideo)>
+        <div class="admin-field" data-video-panel @if (! $hasVideo) hidden @endif>
             <label for="video_url">Link video</label>
             <input id="video_url" type="url" name="video_url"
                 value="{{ old('video_url', $client->video_url) }}"
@@ -211,7 +256,7 @@
     </section>
 
     @if ($errors->any())
-        <div class="admin-errors">
+        <div class="admin-errors" data-form-errors>
             @foreach ($errors->all() as $error)
                 <p>{{ $error }}</p>
             @endforeach
@@ -219,7 +264,7 @@
     @endif
 
     <div class="admin-actions">
-        <button class="admin-btn primary" type="submit">Salva</button>
+        <button class="admin-btn primary" type="submit" data-client-submit>Salva</button>
         <a class="admin-btn" href="{{ route('admin.clients.index') }}">Annulla</a>
     </div>
 

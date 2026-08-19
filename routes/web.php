@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\ClientController as AdminClientController;
 use App\Http\Controllers\Admin\ContactRequestController as AdminContactRequestController;
 use App\Http\Controllers\Admin\CustomerController as AdminCustomerController;
+use App\Http\Controllers\Admin\GalleryUploadController as AdminGalleryUploadController;
 use App\Http\Controllers\Admin\PortfolioProjectController as AdminPortfolioProjectController;
 use App\Http\Controllers\Admin\WorkDeliveryController as AdminWorkDeliveryController;
 use App\Http\Controllers\ClientController;
@@ -26,6 +27,7 @@ Route::middleware('site.access')->group(function () {
     Route::view('/servizi', 'servizi')->name('servizi');
     Route::get('/clienti', [ClientController::class, 'index'])->name('clienti');
     Route::get('/clienti/{client}', [ClientController::class, 'show'])->name('clienti.show');
+    Route::get('/clienti/{client}/gallery', [ClientController::class, 'gallery'])->name('clienti.gallery');
     Route::get('/', [PortfolioController::class, 'home'])->name('home');
     Route::get('/portfolio', [PortfolioController::class, 'index'])->name('portfolio');
     Route::get('/portfolio/{portfolioProject}', [PortfolioController::class, 'show'])->name('portfolio.show');
@@ -47,6 +49,7 @@ Route::prefix('area-clienti')->name('client-area.')->group(function () {
     Route::middleware('client.portal')->group(function () {
         Route::get('/lavori', [ClientPortalController::class, 'index'])->name('index');
         Route::get('/gallerie/{client}', [ClientPortalController::class, 'showClient'])->name('clients.show');
+        Route::get('/gallerie/{client}/immagini', [ClientPortalController::class, 'gallery'])->name('clients.gallery');
         Route::get('/lavori/{workDelivery}', [ClientPortalController::class, 'show'])->name('show');
         Route::post('/logout', [ClientPortalController::class, 'logout'])->name('logout');
     });
@@ -64,6 +67,16 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::resource('clients', AdminClientController::class)
             ->parameters(['clients' => 'client'])
             ->except(['show']);
+        Route::post('clients/{client}/gallery-uploads', [AdminGalleryUploadController::class, 'store'])
+            ->name('clients.gallery-uploads.store');
+        Route::get('clients/{client}/gallery-uploads/{galleryUploadSession}', [AdminGalleryUploadController::class, 'show'])
+            ->name('clients.gallery-uploads.show');
+        Route::post('clients/{client}/gallery-uploads/{galleryUploadSession}/batch', [AdminGalleryUploadController::class, 'batch'])
+            ->name('clients.gallery-uploads.batch');
+        Route::post('clients/{client}/gallery-uploads/{galleryUploadSession}/complete', [AdminGalleryUploadController::class, 'complete'])
+            ->name('clients.gallery-uploads.complete');
+        Route::delete('clients/{client}/gallery-uploads/{galleryUploadSession}', [AdminGalleryUploadController::class, 'destroy'])
+            ->name('clients.gallery-uploads.destroy');
         Route::get('customer-access-links', [AdminCustomerController::class, 'accessLinks'])
             ->name('customer-access-links.index');
         Route::resource('customers', AdminCustomerController::class)

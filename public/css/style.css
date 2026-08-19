@@ -416,6 +416,18 @@ a {
     cursor: zoom-in;
 }
 
+.gallery-load-sentinel {
+    min-height: 48px;
+    display: grid;
+    place-items: center;
+    color: var(--text-color, #222222);
+    font-size: 14px;
+}
+
+.gallery-load-sentinel[hidden] {
+    display: none;
+}
+
 .adaptive-gallery {
     --gallery-gap: 20px;
     display: grid;

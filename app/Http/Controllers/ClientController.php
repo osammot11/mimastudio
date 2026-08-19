@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Client;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
@@ -37,8 +38,32 @@ class ClientController extends Controller
     {
         abort_unless($client->is_published, 404);
 
-        $client->load('images');
+        $galleryImages = $client->images()->cursorPaginate((int) config('gallery.page_size'));
 
-        return view('clienti-show', compact('client'));
+        return view('clienti-show', compact('client', 'galleryImages'));
+    }
+
+    public function gallery(Client $client): JsonResponse
+    {
+        abort_unless($client->is_published, 404);
+
+        return $this->galleryResponse($client);
+    }
+
+    private function galleryResponse(Client $client): JsonResponse
+    {
+        $images = $client->images()->cursorPaginate((int) config('gallery.page_size'));
+
+        return response()->json([
+            'items' => collect($images->items())->map(fn ($image) => [
+                'id' => $image->getKey(),
+                'thumbnail_url' => $image->thumbnailUrl(),
+                'image_url' => $image->imageUrl(),
+                'alt' => $image->alt_text ?: $client->name,
+                'width' => $image->width,
+                'height' => $image->height,
+            ])->values(),
+            'next_cursor' => $images->nextCursor()?->encode(),
+        ]);
     }
 }

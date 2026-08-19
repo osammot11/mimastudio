@@ -42,7 +42,14 @@ class Client extends Model
 
     public function images(): HasMany
     {
-        return $this->hasMany(ClientImage::class)->orderBy('sort_order');
+        return $this->hasMany(ClientImage::class)
+            ->orderBy('sort_order')
+            ->orderBy('id');
+    }
+
+    public function galleryUploadSessions(): HasMany
+    {
+        return $this->hasMany(GalleryUploadSession::class);
     }
 
     public function customer(): BelongsTo

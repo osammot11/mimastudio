@@ -3,15 +3,13 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Mail\ClientWorkReady;
 use App\Models\Client;
 use App\Models\Customer;
+use App\Services\ClientWorkNotifier;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Crypt;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
@@ -19,6 +17,8 @@ use Throwable;
 
 class ClientController extends Controller
 {
+    public function __construct(private ClientWorkNotifier $notifier) {}
+
     public function index(): View
     {
         $clients = Client::query()
@@ -49,7 +49,7 @@ class ClientController extends Controller
         ]);
     }
 
-    public function store(Request $request): RedirectResponse
+    public function store(Request $request): RedirectResponse|JsonResponse
     {
         $data = $this->validatedClientData($request);
         $customer = $this->resolveCustomer($data);
@@ -72,17 +72,27 @@ class ClientController extends Controller
 
     public function edit(Client $client): View
     {
-        $client->load(['customer', 'images']);
+        $client->load('customer');
 
         return view('admin.clients.edit', [
             'client' => $client,
+            'galleryImages' => $client->images()->paginate(
+                (int) config('gallery.admin_page_size'),
+                ['*'],
+                'gallery_page',
+            ),
+            'activeUploadSession' => $client->galleryUploadSessions()
+                ->where('status', 'active')
+                ->where('expires_at', '>', now())
+                ->latest('id')
+                ->first(),
             'customers' => $this->customers(),
             'defaultCustomerMode' => 'existing',
             'selectedCustomerId' => $client->customer_id,
         ]);
     }
 
-    public function update(Request $request, Client $client): RedirectResponse
+    public function update(Request $request, Client $client): RedirectResponse|JsonResponse
     {
         $data = $this->validatedClientData($request, $client);
         $customer = $this->resolveCustomer($data);
@@ -122,6 +132,16 @@ class ClientController extends Controller
 
         foreach ($client->images as $image) {
             $this->deleteStoredFile($image->image_path);
+            $this->deleteStoredFile($image->thumbnail_path);
+        }
+
+        foreach ($client->galleryUploadSessions()->with('items')->get() as $uploadSession) {
+            foreach ($uploadSession->items as $item) {
+                Storage::disk('local')->delete(array_filter([
+                    $item->staged_path,
+                    $item->staged_thumbnail_path,
+                ]));
+            }
         }
 
         $client->delete();
@@ -171,6 +191,7 @@ class ClientController extends Controller
             'sort_order' => ['required', 'integer', 'min:0'],
             'is_published' => ['nullable', 'boolean'],
             'send_notification' => ['nullable', 'boolean'],
+            'defer_notification' => ['nullable', 'boolean'],
             'is_portal_visible' => ['nullable', 'boolean'],
             'has_video' => ['nullable', 'boolean'],
             'video_url' => [
@@ -215,11 +236,15 @@ class ClientController extends Controller
 
     private function storeGalleryImages(Request $request, Client $client): void
     {
+        $nextOrder = ((int) $client->images()->max('sort_order')) + 1;
+
         foreach ($request->file('gallery_images', []) as $image) {
             $client->images()->create([
                 'image_path' => $image->store('clients', 'public'),
+                'original_name' => $image->getClientOriginalName(),
+                'byte_size' => $image->getSize(),
                 'alt_text' => $client->name,
-                'sort_order' => ($client->images()->max('sort_order') ?? 0) + 1,
+                'sort_order' => $nextOrder++,
             ]);
         }
     }
@@ -246,6 +271,7 @@ class ClientController extends Controller
 
         foreach ($images as $image) {
             $this->deleteStoredFile($image->image_path);
+            $this->deleteStoredFile($image->thumbnail_path);
             $image->delete();
         }
     }
@@ -263,28 +289,25 @@ class ClientController extends Controller
         Request $request,
         Client $client,
         string $successMessage,
-    ): RedirectResponse {
+    ): RedirectResponse|JsonResponse {
         $redirect = redirect()->route('admin.clients.edit', $client);
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'client_id' => $client->getKey(),
+                'client_slug' => $client->slug,
+                'redirect_url' => route('admin.clients.edit', $client),
+                'upload_url' => route('admin.clients.gallery-uploads.store', $client),
+                'notification_requested' => $request->boolean('send_notification'),
+            ]);
+        }
 
         if (! $request->boolean('send_notification')) {
             return $redirect->with('status', $successMessage);
         }
 
-        $client->loadMissing('customer');
-
-        if (! $client->customer?->email) {
-            return $redirect
-                ->with('status', $successMessage)
-                ->with(
-                    'status_error',
-                    'Email non inviata: completa prima l’indirizzo nell’anagrafica del cliente.',
-                );
-        }
-
         try {
-            Mail::to($client->customer->email)->send(
-                new ClientWorkReady($client, $this->clientAccessUrl($client)),
-            );
+            $this->notifier->send($client);
 
             return $redirect->with(
                 'status',
@@ -300,26 +323,6 @@ class ClientController extends Controller
                     'Il cliente è stato salvato, ma l’email di notifica non è stata inviata.',
                 );
         }
-    }
-
-    private function clientAccessUrl(Client $client): ?string
-    {
-        $client->loadMissing('customer');
-
-        if ($client->is_portal_visible) {
-            return URL::temporarySignedRoute(
-                'client-area.authenticate',
-                now()->addDays(7),
-                [
-                    'token' => Crypt::encryptString($client->customer->email),
-                    'client' => $client->getKey(),
-                ],
-            );
-        }
-
-        return $client->is_published
-            ? route('clienti.show', $client)
-            : null;
     }
 
     private function resolveCustomer(array $data): Customer
@@ -341,6 +344,7 @@ class ClientController extends Controller
             $data['new_customer_name'],
             $data['new_customer_email'],
             $data['send_notification'],
+            $data['defer_notification'],
             $data['has_video'],
         );
     }

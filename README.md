@@ -56,3 +56,48 @@ If you discover a security vulnerability within Laravel, please send an e-mail t
 ## License
 
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+
+## Gallery clienti
+
+Le gallery clienti supportano fino a 1000 immagini JPEG, PNG o WebP da 4 MB ciascuna. I file vengono caricati in sessioni riprendibili, in batch da massimo 8 file e sono pubblicati solamente dopo la finalizzazione completa.
+
+Requisiti PHP-FPM consigliati:
+
+```ini
+upload_max_filesize = 5M
+post_max_size = 40M
+max_file_uploads = 10
+memory_limit = 256M
+max_execution_time = 120
+```
+
+Nel virtual host Nginx:
+
+```nginx
+client_max_body_size 40M;
+client_body_timeout 300s;
+```
+
+Configurazione applicativa di produzione:
+
+```dotenv
+DB_BUSY_TIMEOUT=5000
+DB_JOURNAL_MODE=WAL
+DB_SYNCHRONOUS=NORMAL
+GALLERY_MIN_FREE_SPACE_MB=5120
+```
+
+Dopo il deploy eseguire:
+
+```bash
+php artisan migrate --force
+php artisan gallery:generate-thumbnails
+php artisan optimize:clear
+php artisan config:cache
+```
+
+Lo scheduler elimina ogni ora gli upload temporanei scaduti. Sul server deve essere presente il cron Laravel:
+
+```cron
+* * * * * cd /var/www/mimastudio && php artisan schedule:run >> /dev/null 2>&1
+```

@@ -335,97 +335,143 @@ document.querySelectorAll('.review-container').forEach(reviewContainer => {
     updateMeasurements();
 });
 
-// Gallery custom layout
+// Gallery custom layout and progressive loading
 
 const adaptiveGalleries = document.querySelectorAll('.adaptive-gallery');
 
-if (adaptiveGalleries.length > 0) {
-    function updateGalleryImage(image) {
-        if (image.naturalWidth === 0 || image.naturalHeight === 0) {
+function galleryImageDimensions(image) {
+    const width = Number(image.dataset.width) || image.naturalWidth;
+    const height = Number(image.dataset.height) || image.naturalHeight;
+    return width && height ? { width, height } : null;
+}
+
+function updateGalleryImage(image) {
+    const dimensions = galleryImageDimensions(image);
+    if (!dimensions) {
+        return false;
+    }
+    image.classList.toggle('gallery-image-landscape', dimensions.width > dimensions.height);
+    image.classList.toggle('gallery-image-portrait', dimensions.width <= dimensions.height);
+    return true;
+}
+
+function updateGalleryRows(gallery) {
+    const images = Array.from(gallery.querySelectorAll('img')).filter(updateGalleryImage);
+    images.forEach(image => image.classList.remove('gallery-image-landscape-wide'));
+    let usedColumns = 0;
+    let rowTypes = [];
+
+    images.forEach((image, index) => {
+        const isLandscape = image.classList.contains('gallery-image-landscape');
+        const nextImage = images[index + 1];
+        const nextIsPortrait = nextImage?.classList.contains('gallery-image-portrait') || false;
+        const shouldPairWithPortrait = isLandscape && (
+            (usedColumns === 0 && nextIsPortrait) ||
+            (usedColumns === 2 && rowTypes.length === 1 && rowTypes[0] === 'portrait')
+        );
+        let span = isLandscape ? (shouldPairWithPortrait ? 4 : 3) : 2;
+
+        if (usedColumns + span > 6) {
+            usedColumns = 0;
+            rowTypes = [];
+            const shouldPairFromNewRow = isLandscape && nextIsPortrait;
+            span = isLandscape ? (shouldPairFromNewRow ? 4 : 3) : 2;
+            image.classList.toggle('gallery-image-landscape-wide', shouldPairFromNewRow);
+        } else if (shouldPairWithPortrait) {
+            image.classList.add('gallery-image-landscape-wide');
+        }
+
+        usedColumns += span;
+        rowTypes.push(isLandscape ? 'landscape' : 'portrait');
+        if (usedColumns >= 6) {
+            usedColumns = 0;
+            rowTypes = [];
+        }
+    });
+}
+
+function initializeGalleryImage(image, gallery) {
+    image.setAttribute('tabindex', '0');
+    image.setAttribute('role', 'button');
+    image.setAttribute('aria-label', image.alt ? `Apri immagine ${image.alt}` : 'Apri immagine');
+    if (updateGalleryImage(image)) {
+        updateGalleryRows(gallery);
+    } else {
+        image.addEventListener('load', () => updateGalleryRows(gallery), { once: true });
+    }
+}
+
+adaptiveGalleries.forEach(gallery => {
+    gallery.querySelectorAll('img').forEach(image => initializeGalleryImage(image, gallery));
+});
+
+window.addEventListener('resize', () => {
+    adaptiveGalleries.forEach(updateGalleryRows);
+});
+
+document.querySelectorAll('[data-progressive-gallery]').forEach(gallery => {
+    const endpoint = gallery.dataset.galleryEndpoint;
+    const sentinel = gallery.nextElementSibling?.matches('[data-gallery-sentinel]')
+        ? gallery.nextElementSibling
+        : null;
+    let nextCursor = gallery.dataset.nextCursor || null;
+    let loadingPromise = null;
+
+    gallery.hasMorePages = () => Boolean(nextCursor);
+    gallery.loadNextPage = async () => {
+        if (!endpoint || !nextCursor) {
             return false;
         }
-
-        image.classList.toggle('gallery-image-landscape', image.naturalWidth > image.naturalHeight);
-        image.classList.toggle('gallery-image-portrait', image.naturalWidth <= image.naturalHeight);
-
-        return true;
-    }
-
-    function updateGalleryRows(gallery) {
-        const images = Array.from(gallery.querySelectorAll('img'));
-
-        if (images.some(image => image.naturalWidth === 0 || image.naturalHeight === 0)) {
-            return;
+        if (loadingPromise) {
+            return loadingPromise;
         }
+        const url = new URL(endpoint, window.location.origin);
+        url.searchParams.set('cursor', nextCursor);
 
-        images.forEach(image => {
-            image.classList.remove('gallery-image-landscape-wide');
-        });
-
-        let usedColumns = 0;
-        let rowTypes = [];
-
-        images.forEach((image, index) => {
-            const isLandscape = image.classList.contains('gallery-image-landscape');
-            const nextImage = images[index + 1];
-            const nextIsPortrait = nextImage ? nextImage.naturalWidth <= nextImage.naturalHeight : false;
-            const shouldPairWithPortrait = isLandscape && (
-                (usedColumns === 0 && nextIsPortrait) ||
-                (usedColumns === 2 && rowTypes.length === 1 && rowTypes[0] === 'portrait')
-            );
-
-            let span = isLandscape ? (shouldPairWithPortrait ? 4 : 3) : 2;
-
-            if (usedColumns + span > 6) {
-                usedColumns = 0;
-                rowTypes = [];
-
-                const shouldPairFromNewRow = isLandscape && nextIsPortrait;
-                span = isLandscape ? (shouldPairFromNewRow ? 4 : 3) : 2;
-
-                if (shouldPairFromNewRow) {
-                    image.classList.add('gallery-image-landscape-wide');
+        loadingPromise = (async () => {
+            try {
+                const response = await fetch(url, { headers: { Accept: 'application/json' } });
+                if (!response.ok) {
+                    throw new Error('Impossibile caricare altre immagini.');
                 }
-            } else if (shouldPairWithPortrait) {
-                image.classList.add('gallery-image-landscape-wide');
-            }
-
-            usedColumns += span;
-            rowTypes.push(isLandscape ? 'landscape' : 'portrait');
-
-            if (usedColumns >= 6) {
-                usedColumns = 0;
-                rowTypes = [];
-            }
-        });
-    }
-
-    function updateAdaptiveGalleries() {
-        adaptiveGalleries.forEach(gallery => {
-            gallery.querySelectorAll('img').forEach(image => {
-                updateGalleryImage(image);
-            });
-            updateGalleryRows(gallery);
-        });
-    }
-
-    adaptiveGalleries.forEach(gallery => {
-        gallery.querySelectorAll('img').forEach(image => {
-            if (image.complete) {
-                updateGalleryImage(image);
+                const payload = await response.json();
+                payload.items.forEach(item => {
+                    const image = document.createElement('img');
+                    image.src = item.thumbnail_url;
+                    image.dataset.fullSrc = item.image_url;
+                    if (item.width) image.dataset.width = item.width;
+                    if (item.height) image.dataset.height = item.height;
+                    image.alt = item.alt || '';
+                    image.loading = 'lazy';
+                    image.decoding = 'async';
+                    gallery.append(image);
+                    initializeGalleryImage(image, gallery);
+                });
+                nextCursor = payload.next_cursor || null;
+                gallery.dataset.nextCursor = nextCursor || '';
+                if (sentinel) sentinel.hidden = !nextCursor;
                 updateGalleryRows(gallery);
-                return;
+                return payload.items.length > 0;
+            } catch (exception) {
+                if (sentinel) sentinel.textContent = exception.message;
+                return false;
+            } finally {
+                loadingPromise = null;
             }
+        })();
 
-            image.addEventListener('load', () => {
-                updateGalleryImage(image);
-                updateGalleryRows(gallery);
-            });
-        });
-    });
+        return loadingPromise;
+    };
 
-    window.addEventListener('resize', updateAdaptiveGalleries);
-}
+    if (sentinel && nextCursor && 'IntersectionObserver' in window) {
+        const observer = new IntersectionObserver(entries => {
+            if (entries.some(entry => entry.isIntersecting)) {
+                gallery.loadNextPage();
+            }
+        }, { rootMargin: '800px 0px' });
+        observer.observe(sentinel);
+    }
+});
 
 // Lightbox gallery
 
@@ -434,11 +480,10 @@ const lightboxImage = lightbox ? lightbox.querySelector('img') : null;
 const lightboxClose = lightbox ? lightbox.querySelector('.gallery-lightbox-close') : null;
 const lightboxPrevious = lightbox ? lightbox.querySelector('.gallery-lightbox-prev') : null;
 const lightboxNext = lightbox ? lightbox.querySelector('.gallery-lightbox-next') : null;
-const galleryImages = document.querySelectorAll('.lightbox-gallery img');
 
-if (lightbox && lightboxImage && lightboxClose && lightboxPrevious && lightboxNext && galleryImages.length > 0) {
+if (lightbox && lightboxImage && lightboxClose && lightboxPrevious && lightboxNext && document.querySelector('.lightbox-gallery img')) {
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const lightboxGalleryImages = Array.from(galleryImages);
+    const galleryImages = () => Array.from(document.querySelectorAll('.lightbox-gallery img'));
     let activeImage = null;
     let currentImageIndex = 0;
 
@@ -454,11 +499,12 @@ if (lightbox && lightboxImage && lightboxClose && lightboxPrevious && lightboxNe
     }
 
     function setLightboxImage(index, animate = true) {
-        currentImageIndex = (index + lightboxGalleryImages.length) % lightboxGalleryImages.length;
-        activeImage = lightboxGalleryImages[currentImageIndex];
+        const images = galleryImages();
+        currentImageIndex = (index + images.length) % images.length;
+        activeImage = images[currentImageIndex];
 
         function updateImage() {
-            lightboxImage.src = activeImage.currentSrc || activeImage.src;
+            lightboxImage.src = activeImage.dataset.fullSrc || activeImage.currentSrc || activeImage.src;
             lightboxImage.alt = activeImage.alt || '';
         }
 
@@ -518,7 +564,15 @@ if (lightbox && lightboxImage && lightboxClose && lightboxPrevious && lightboxNe
         setLightboxImage(currentImageIndex - 1);
     }
 
-    function showNextImage() {
+    async function showNextImage() {
+        let images = galleryImages();
+        if (currentImageIndex === images.length - 1) {
+            const gallery = activeImage?.closest('[data-progressive-gallery]');
+            if (gallery?.hasMorePages?.()) {
+                await gallery.loadNextPage();
+                images = galleryImages();
+            }
+        }
         setLightboxImage(currentImageIndex + 1);
     }
 
@@ -562,21 +616,17 @@ if (lightbox && lightboxImage && lightboxClose && lightboxPrevious && lightboxNe
         resetLightbox();
     }
 
-    lightboxGalleryImages.forEach((image, index) => {
-        image.setAttribute('tabindex', '0');
-        image.setAttribute('role', 'button');
-        image.setAttribute('aria-label', image.alt ? `Apri immagine ${image.alt}` : 'Apri immagine');
+    document.addEventListener('click', event => {
+        const image = event.target.closest('.lightbox-gallery img');
+        if (image) openLightbox(galleryImages().indexOf(image));
+    });
 
-        image.addEventListener('click', () => {
-            openLightbox(index);
-        });
-
-        image.addEventListener('keydown', event => {
-            if (event.key === 'Enter' || event.key === ' ') {
-                event.preventDefault();
-                openLightbox(index);
-            }
-        });
+    document.addEventListener('keydown', event => {
+        const image = event.target.closest?.('.lightbox-gallery img');
+        if (image && (event.key === 'Enter' || event.key === ' ')) {
+            event.preventDefault();
+            openLightbox(galleryImages().indexOf(image));
+        }
     });
 
     lightboxClose.addEventListener('click', closeLightbox);

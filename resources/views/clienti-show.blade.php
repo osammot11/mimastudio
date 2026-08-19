@@ -46,13 +46,20 @@
     </section>
 
     <section class="section-xl-padding">
-        <div class="wrapper lightbox-gallery adaptive-gallery">
-            <img src="{{ $client->photoImageUrl() }}" alt="{{ $client->name }}">
-            <img src="{{ $client->coverImageUrl() }}" alt="{{ $client->name }}">
+        <div class="wrapper lightbox-gallery adaptive-gallery" data-progressive-gallery
+            data-gallery-endpoint="{{ route('clienti.gallery', $client) }}"
+            data-next-cursor="{{ $galleryImages->nextCursor()?->encode() }}">
+            <img src="{{ $client->photoImageUrl() }}" data-full-src="{{ $client->photoImageUrl() }}" alt="{{ $client->name }}" decoding="async">
+            <img src="{{ $client->coverImageUrl() }}" data-full-src="{{ $client->coverImageUrl() }}" alt="{{ $client->name }}" decoding="async">
 
-            @foreach ($client->images as $image)
-                <img src="{{ $image->imageUrl() }}" alt="{{ $image->alt_text ?: $client->name }}">
+            @foreach ($galleryImages as $image)
+                <img src="{{ $image->thumbnailUrl() }}" data-full-src="{{ $image->imageUrl() }}"
+                    data-width="{{ $image->width }}" data-height="{{ $image->height }}"
+                    alt="{{ $image->alt_text ?: $client->name }}" loading="lazy" decoding="async">
             @endforeach
+        </div>
+        <div class="gallery-load-sentinel" data-gallery-sentinel @if (! $galleryImages->hasMorePages()) hidden @endif>
+            Caricamento immagini
         </div>
     </section>
 @endsection
