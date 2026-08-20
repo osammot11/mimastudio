@@ -182,7 +182,10 @@ li {
 
 /* bottoni e link */
 .btn {
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
     text-align: center;
     font-weight: 500;
     font-size: 16px;
@@ -204,7 +207,10 @@ li {
 }
 
 .btn-2 {
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
     text-align: center;
     font-weight: 500;
     font-size: 16px;
@@ -218,6 +224,23 @@ li {
     border-right: none;
     transition: all 0.3s ease;
     cursor: pointer;
+}
+
+.btn::after,
+.btn-2::after {
+    content: "";
+    flex: 0 0 18px;
+    width: 18px;
+    height: 18px;
+    background-color: currentColor;
+    -webkit-mask: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='black'%20stroke-width='1.25'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Cpath%20d='M13%205H19V11'/%3E%3Cpath%20d='M19%205L5%2019'/%3E%3C/svg%3E") center / contain no-repeat;
+    mask: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='black'%20stroke-width='1.25'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Cpath%20d='M13%205H19V11'/%3E%3Cpath%20d='M19%205L5%2019'/%3E%3C/svg%3E") center / contain no-repeat;
+    transition: transform 0.3s ease;
+}
+
+.btn:hover::after,
+.btn-2:hover::after {
+    transform: translate(2px, -2px);
 }
 
 .hyperlink,
