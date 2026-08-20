@@ -285,10 +285,12 @@
                     <div class="review-cards-container">
                         <div class="review-track">
                             <div class="review-card stack-xl">
-                                <h4>"Michele ha saputo metterci a nostro agio e restituire immagini naturali, curate e mai forzate."</h4>
+                                <h4>"Michele ha saputo valorizzare al massimo il nostro catalogo, sia con shooting in studio che in location molto complesse.
+                                    Il suo lavoro ci ha permesso di espanderci globalmente e raggiungere clienti in 46 paesi nel mondo.
+                                    Sunseters non sarebbe esistito senza il suo sforzo e le sue capacità eccezionali."</h4>
                                     <div>
-                                        <h6>Cliente ritratto</h6>
-                                        <p class="color-disabled">Ritratti professionali</p>
+                                        <h6>Tommaso Giovannoni</h6>
+                                        <p class="color-disabled">Co-Fondatore Sunseters Brand</p>
                                     </div>
                             </div>
 
