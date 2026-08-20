@@ -24,6 +24,7 @@ Route::middleware('site.access')->group(function () {
     Route::post('/contatti', [ContactRequestController::class, 'store'])
         ->middleware('throttle:5,1')
         ->name('contatti.store');
+    Route::view('/about', 'about')->name('about');
     Route::view('/servizi', 'servizi')->name('servizi');
     Route::get('/clienti', [ClientController::class, 'index'])->name('clienti');
     Route::get('/clienti/{client}', [ClientController::class, 'show'])->name('clienti.show');
