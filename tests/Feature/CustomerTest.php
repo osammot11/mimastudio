@@ -6,8 +6,6 @@ use App\Models\Client;
 use App\Models\Customer;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 class CustomerTest extends TestCase
@@ -57,63 +55,6 @@ class CustomerTest extends TestCase
             ->assertSessionHasErrors('email');
 
         $this->assertDatabaseCount('customers', 1);
-    }
-
-    public function test_admin_can_upload_replace_and_remove_a_customer_png_logo(): void
-    {
-        Storage::fake('public');
-        $user = User::factory()->create();
-
-        $this->actingAs($user)->post(route('admin.customers.store'), [
-            'name' => 'Brand Uno',
-            'email' => 'brand@example.com',
-            'logo' => UploadedFile::fake()->image('brand.png', 400, 200),
-        ])->assertRedirect();
-
-        $customer = Customer::firstOrFail();
-        $firstLogo = $customer->logo_path;
-
-        $this->assertNotNull($firstLogo);
-        Storage::disk('public')->assertExists($firstLogo);
-
-        $this->actingAs($user)->put(route('admin.customers.update', $customer), [
-            'name' => $customer->name,
-            'email' => $customer->email,
-            'logo' => UploadedFile::fake()->image('nuovo-logo.png', 400, 200),
-        ])->assertRedirect();
-
-        $customer->refresh();
-        Storage::disk('public')->assertMissing($firstLogo);
-        Storage::disk('public')->assertExists($customer->logo_path);
-
-        $lastLogo = $customer->logo_path;
-
-        $this->actingAs($user)->put(route('admin.customers.update', $customer), [
-            'name' => $customer->name,
-            'email' => $customer->email,
-            'remove_logo' => '1',
-        ])->assertRedirect();
-
-        $this->assertNull($customer->fresh()->logo_path);
-        Storage::disk('public')->assertMissing($lastLogo);
-    }
-
-    public function test_customer_logo_must_be_a_png(): void
-    {
-        Storage::fake('public');
-        $user = User::factory()->create();
-
-        $this->actingAs($user)
-            ->from(route('admin.customers.create'))
-            ->post(route('admin.customers.store'), [
-                'name' => 'Brand JPG',
-                'email' => 'jpg@example.com',
-                'logo' => UploadedFile::fake()->image('brand.jpg'),
-            ])
-            ->assertRedirect(route('admin.customers.create'))
-            ->assertSessionHasErrors('logo');
-
-        $this->assertDatabaseCount('customers', 0);
     }
 
     public function test_updating_customer_email_keeps_all_works_linked(): void

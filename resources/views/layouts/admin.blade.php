@@ -21,6 +21,7 @@
             @auth
                 <nav class="admin-nav" aria-label="Admin">
                     <a @class(['active' => request()->routeIs('admin.portfolio.*')]) href="{{ route('admin.portfolio.index') }}">Portfolio</a>
+                    <a @class(['active' => request()->routeIs('admin.client-logos.*')]) href="{{ route('admin.client-logos.index') }}">Loghi clienti</a>
                     <a @class(['active' => request()->routeIs('admin.clients.*')]) href="{{ route('admin.clients.index') }}">Lavori clienti</a>
                     <a @class(['active' => request()->routeIs('admin.customers.*')]) href="{{ route('admin.customers.index') }}">Anagrafica clienti</a>
                     <a @class(['active' => request()->routeIs('admin.customer-access-links.*')]) href="{{ route('admin.customer-access-links.index') }}">Link area clienti</a>
@@ -66,6 +67,7 @@
         </main>
     </div>
     <script src="{{ asset('js/admin-gallery.js') }}?v={{ filemtime(public_path('js/admin-gallery.js')) }}" defer></script>
+    @stack('scripts')
 </body>
 
 </html>

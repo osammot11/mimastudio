@@ -339,6 +339,32 @@ select {
     gap: 18px;
 }
 
+.admin-logo-page {
+    display: grid;
+    gap: 18px;
+}
+
+.admin-logo-table .admin-table-head,
+.admin-logo-row {
+    grid-template-columns: 110px minmax(180px, 1fr) 90px minmax(220px, 1fr) 180px;
+}
+
+.admin-logo-preview {
+    display: block;
+    width: 100%;
+    max-width: 100px;
+    height: 64px;
+    border: 1px solid var(--admin-border);
+    border-radius: 6px;
+    background: var(--admin-surface-muted);
+    object-fit: contain;
+    padding: 6px;
+}
+
+.admin-logo-row .admin-table-label {
+    display: none;
+}
+
 .admin-form [hidden] {
     display: none !important;
 }
@@ -612,10 +638,15 @@ select {
     .admin-deliveries .admin-row,
     .admin-customers .admin-row,
     .admin-portal-links .admin-row,
+    .admin-logo-row,
     .admin-gallery-row,
     .admin-media-field,
     .admin-grid-2 {
         grid-template-columns: 1fr;
+    }
+
+    .admin-logo-row .admin-table-label {
+        display: block;
     }
 
     .admin-row {

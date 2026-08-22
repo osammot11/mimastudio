@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\ClientController as AdminClientController;
+use App\Http\Controllers\Admin\ClientLogoController as AdminClientLogoController;
 use App\Http\Controllers\Admin\ContactRequestController as AdminContactRequestController;
 use App\Http\Controllers\Admin\CustomerController as AdminCustomerController;
 use App\Http\Controllers\Admin\GalleryUploadController as AdminGalleryUploadController;
@@ -65,6 +66,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::middleware('auth')->group(function () {
         Route::redirect('/', '/admin/portfolio')->name('dashboard');
         Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+        Route::resource('client-logos', AdminClientLogoController::class)
+            ->parameters(['client-logos' => 'clientLogo'])
+            ->only(['index', 'store', 'update', 'destroy']);
         Route::resource('clients', AdminClientController::class)
             ->parameters(['clients' => 'client'])
             ->except(['show']);

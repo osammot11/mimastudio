@@ -19,24 +19,6 @@
             <p class="admin-help">Questa email identifica univocamente l'area riservata del cliente.</p>
         </div>
 
-        <div class="admin-media-field">
-            @if ($customer->logo_path)
-                <img class="admin-preview" src="{{ $customer->logoUrl() }}" alt="Logo {{ $customer->name }}">
-            @endif
-
-            <div class="admin-field">
-                <label for="logo">Logo cliente</label>
-                <input id="logo" type="file" name="logo" accept="image/png,.png">
-                <p class="admin-help">PNG opzionale, massimo 4 MB. Verrà mostrato nello slider della homepage.</p>
-
-                @if ($customer->logo_path)
-                    <label class="admin-check">
-                        <input type="checkbox" name="remove_logo" value="1">
-                        Rimuovi il logo attuale
-                    </label>
-                @endif
-            </div>
-        </div>
     </section>
 
     @if ($errors->any())
